@@ -1,0 +1,7 @@
+{
+  "name": "node-domexception",
+  "version": "1.0.0",
+  "description": "Polyfill for DOMException (local override)",
+  "main": "index.js",
+  "license": "MIT"
+}
