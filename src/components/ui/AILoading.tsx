@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Loader2, BrainCircuit, Cpu } from 'lucide-react';
+import { Sparkles, Loader2, BrainCircuit } from 'lucide-react';
 
 interface AILoadingProps {
   title?: string;

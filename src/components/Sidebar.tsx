@@ -11,7 +11,6 @@ import {
   Layers, 
   Bookmark, 
   Wrench, 
-  Menu, 
   X, 
   Zap,
   Sparkles

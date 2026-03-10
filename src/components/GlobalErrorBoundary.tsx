@@ -77,7 +77,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col gap-3">
               <button
                 onClick={this.handleReload}
-                className="btn btn-primary flex items-center justify-center space-x-2 w-full"
+                className="flex items-center justify-center space-x-2 w-full px-6 py-3 bg-[#1a73e8] text-white rounded-xl hover:bg-[#1557b0] transition-all font-medium shadow-md hover:shadow-lg active:scale-95"
               >
                 <RefreshCw size={16} />
                 <span>Reload Page</span>
@@ -86,14 +86,14 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <div className="flex gap-3">
                 <button
                   onClick={this.handleReport}
-                  className="btn btn-secondary flex-1 flex items-center justify-center space-x-2"
+                  className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-white dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] rounded-xl border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-all font-medium text-sm active:scale-95"
                 >
                   <Mail size={16} />
                   <span>Report</span>
                 </button>
                 <button
                   onClick={this.handleGoHome}
-                  className="btn btn-secondary flex-1 flex items-center justify-center space-x-2"
+                  className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-white dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] rounded-xl border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-all font-medium text-sm active:scale-95"
                 >
                   <Home size={16} />
                   <span>Home</span>

@@ -7,7 +7,6 @@ import { Toaster } from './components/ui/Toaster';
 import { FeedItem } from './types';
 import { useDebounce } from './hooks/useDebounce';
 import { useUserPreferences } from './hooks/useUserPreferences';
-import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSummarizer } from './hooks/useSummarizer';
