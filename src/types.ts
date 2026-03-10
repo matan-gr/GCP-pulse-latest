@@ -23,8 +23,11 @@ export interface FeedItem {
   videoId?: string;
   thumbnailUrl?: string;
   channelName?: string;
+  channelTitle?: string;
   duration?: string;
   durationSeconds?: number;
+  viewCount?: number;
+  likeCount?: number;
 }
 
 export interface Feed {

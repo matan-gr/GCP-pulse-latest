@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FeedItem } from '../types';
 import { toast } from 'sonner';
 import { getAiInstance } from '../services/geminiService';
@@ -9,25 +9,56 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const autoRefreshRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchServerCache = async () => {
+    try {
+      const res = await fetch('/api/weekly-brief');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.error("Failed to fetch weekly brief cache", e);
+    }
+    return null;
+  };
 
   const generateBrief = useCallback(async (force = false) => {
     if (loading || items.length === 0) return;
 
     if (!force) {
-      const cached = localStorage.getItem('weekly_brief_cache');
-      if (cached) {
-        try {
-          const { content, timestamp } = JSON.parse(cached);
-          const age = Date.now() - timestamp;
-          if (age < 60 * 60 * 1000) { // 60 minutes
-            setBrief(content);
-            setLastUpdated(new Date(timestamp));
-            return;
-          }
-        } catch (e) {
-          console.error("Failed to parse cached brief", e);
+      const serverCache = await fetchServerCache();
+      if (serverCache && serverCache.content) {
+        const age = Date.now() - serverCache.timestamp;
+        if (age < 90 * 60 * 1000) { // 90 minutes
+          setBrief(serverCache.content);
+          setLastUpdated(new Date(serverCache.timestamp));
+          return;
         }
       }
+    }
+
+    // Try to acquire lock
+    try {
+      const lockRes = await fetch('/api/weekly-brief/lock', { method: 'POST' });
+      if (!lockRes.ok) {
+        // Someone else is generating, start polling
+        setLoading(true);
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = setInterval(async () => {
+          const cache = await fetchServerCache();
+          if (cache && cache.content && !cache.isGenerating) {
+            setBrief(cache.content);
+            setLastUpdated(new Date(cache.timestamp));
+            setLoading(false);
+            if (pollingRef.current) clearInterval(pollingRef.current);
+          }
+        }, 5000);
+        return;
+      }
+    } catch (e) {
+      console.error("Failed to acquire lock", e);
     }
 
     if (!checkRateLimit('weekly_brief', 10, 90)) {
@@ -57,18 +88,13 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         // 2. Include UPCOMING deprecations (within next 90 days)
         if (item.source === 'Product Deprecations' && item.eolDate) {
            const eol = new Date(item.eolDate);
-           
-           // If EOL is in the future and within 90 days, include it
            if (eol > now && eol <= ninetyDaysFromNow) return true;
-           
-           // If EOL was in the last 7 days, include it
            if (eol >= oneWeekAgo && eol <= now) return true;
         }
         
         return false;
       });
       
-      // If no items in last week, fall back to last 30 days but mention it
       const contextItems = weeklyItems.length > 0 ? weeklyItems : items.slice(0, 50);
       const timeWindow = weeklyItems.length > 0 ? "Last 7 Days + Upcoming Deprecations" : "Recent Updates (Low volume week)";
 
@@ -77,7 +103,7 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         source: i.source,
         date: i.isoDate,
         eolDate: i.eolDate,
-        summary: i.contentSnippet || i.content?.slice(0, 1000), // Increased context size
+        summary: i.contentSnippet || i.content?.slice(0, 1000),
         link: i.link
       })));
 
@@ -162,10 +188,13 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         
         recordUsage('weekly_brief', 90);
         
-        localStorage.setItem('weekly_brief_cache', JSON.stringify({
-          content: text,
-          timestamp: now.getTime()
-        }));
+        // Save to server cache
+        await fetch('/api/weekly-brief', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: text })
+        });
+        
       } else {
         throw new Error("No content generated");
       }
@@ -174,27 +203,45 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
       console.error("Failed to generate brief:", err);
       setError(err.message || "Failed to generate briefing");
       toast.error("Failed to generate weekly brief", { description: "An error occurred while analyzing the latest updates." });
+      
+      // Release lock on failure
+      await fetch('/api/weekly-brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: null }) // This will fail validation but we can handle it or just let it expire
+      }).catch(() => {});
+      
     } finally {
       setLoading(false);
     }
   }, [items, loading]);
 
   useEffect(() => {
-    const cached = localStorage.getItem('weekly_brief_cache');
-    if (cached) {
-      try {
-        const { content, timestamp } = JSON.parse(cached);
-        const age = Date.now() - timestamp;
-        if (age < 60 * 60 * 1000) { // 60 minutes
-          setBrief(content);
-          setLastUpdated(new Date(timestamp));
-        }
-      } catch (e) {
-        console.error("Failed to parse cached brief", e);
-        localStorage.removeItem('weekly_brief_cache');
-      }
+    // Initial fetch
+    if (items.length > 0 && !brief && !loading) {
+      generateBrief(false);
     }
-  }, []);
+  }, [items.length]);
+
+  useEffect(() => {
+    // Auto-refresh logic
+    if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
+    
+    autoRefreshRef.current = setInterval(async () => {
+      const cache = await fetchServerCache();
+      if (!cache || !cache.content || (Date.now() - cache.timestamp >= 90 * 60 * 1000)) {
+        // Cache is stale or missing, trigger regeneration
+        if (items.length > 0) {
+          generateBrief(true);
+        }
+      }
+    }, 60000); // Check every minute
+
+    return () => {
+      if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [items, generateBrief]);
 
   return {
     brief,

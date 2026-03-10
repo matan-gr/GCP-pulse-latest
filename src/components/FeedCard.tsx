@@ -367,10 +367,24 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                 </a>
             </h3>
 
-          {item.channelName && (
-            <div className="mb-1.5 flex items-center text-[10px] text-[#5f6368] dark:text-[#9aa0a6]">
-              <Youtube size={10} className="mr-1 text-[#ea4335]" />
-              <span className="font-medium">{item.channelName}</span>
+          {(item.channelName || item.channelTitle) && (
+            <div className="mb-1.5 flex items-center text-[10px] text-[#5f6368] dark:text-[#9aa0a6] space-x-2">
+              <div className="flex items-center">
+                <Youtube size={10} className="mr-1 text-[#ea4335]" />
+                <span className="font-medium">{item.channelName || item.channelTitle}</span>
+              </div>
+              {item.viewCount !== undefined && (
+                <div className="flex items-center">
+                  <span className="opacity-50 mx-1">•</span>
+                  <span>{new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(item.viewCount)} views</span>
+                </div>
+              )}
+              {item.likeCount !== undefined && (
+                <div className="flex items-center">
+                  <span className="opacity-50 mx-1">•</span>
+                  <span>{new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(item.likeCount)} likes</span>
+                </div>
+              )}
             </div>
           )}
 

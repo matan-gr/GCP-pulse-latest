@@ -175,7 +175,8 @@ const enrichYouTubeItems = async (items: any[]) => {
           likeCount: parseInt(details.statistics.likeCount, 10),
           channelTitle: details.snippet.channelTitle,
           categories: labels,
-          videoId: details.id
+          videoId: details.id,
+          thumbnailUrl: details.snippet.thumbnails?.maxres?.url || details.snippet.thumbnails?.high?.url || details.snippet.thumbnails?.medium?.url || details.snippet.thumbnails?.default?.url
         };
       }
       return item;
@@ -310,6 +311,42 @@ let incidentsCache: {
   timestamp: number;
 } | null = null;
 const INCIDENTS_CACHE_DURATION = 1000 * 60 * 15; // 15 minutes cache
+
+// In-memory cache for weekly brief
+let weeklyBriefCache = {
+  content: null as string | null,
+  timestamp: 0,
+  isGenerating: false
+};
+
+app.get("/api/weekly-brief", (req, res) => {
+  res.json(weeklyBriefCache);
+});
+
+app.post("/api/weekly-brief/lock", (req, res) => {
+  if (weeklyBriefCache.isGenerating && Date.now() - weeklyBriefCache.timestamp < 5 * 60 * 1000) {
+    return res.status(409).json({ error: "Already generating" });
+  }
+  weeklyBriefCache.isGenerating = true;
+  weeklyBriefCache.timestamp = Date.now();
+  res.json({ success: true });
+});
+
+app.post("/api/weekly-brief", (req, res) => {
+  const { content } = req.body;
+  if (!content) {
+    // If content is null/empty, it means generation failed. Just release the lock.
+    weeklyBriefCache.isGenerating = false;
+    return res.status(400).json({ error: "Missing content, lock released" });
+  }
+  
+  weeklyBriefCache = {
+    content,
+    timestamp: Date.now(),
+    isGenerating: false
+  };
+  res.json({ success: true });
+});
 
 app.get("/api/incidents", async (req, res) => {
   try {
