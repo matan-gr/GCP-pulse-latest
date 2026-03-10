@@ -49,7 +49,25 @@ interface AppLayoutProps {
   onClearFilters?: () => void;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({
+const CurrentTime = () => {
+  const [currentTime, setCurrentTime] = React.useState(new Date());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="flex items-center gap-1.5">
+      <Database size={10} className="sm:w-3 sm:h-3" /> 
+      {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    </span>
+  );
+};
+
+export const AppLayout = React.memo<AppLayoutProps>(({
   children,
   activeTab,
   setActiveTab,
@@ -80,14 +98,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 }) => {
   const { theme, toggleTheme } = useTheme();
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-app)] dark:bg-[var(--color-bg-app-dark)] font-sans text-slate-950 dark:text-slate-50 flex">
@@ -253,7 +263,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <footer className={`fixed bottom-0 right-0 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl border-t border-[#dadce0] dark:border-[#3c4043] py-2 px-4 sm:px-6 z-40 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'left-72' : 'left-0'}`}>
           <div className="max-w-[1600px] mx-auto flex justify-between items-center text-[9px] sm:text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6]">
             <div className="flex items-center gap-3 sm:gap-4 uppercase tracking-widest">
-              <span className="flex items-center gap-1.5"><Database size={10} className="sm:w-3 sm:h-3" /> {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <CurrentTime />
               <span className="hidden xs:inline-block opacity-30">|</span>
               <span className="hidden xs:inline-block">GCP Pulse v1.2</span>
             </div>
@@ -270,4 +280,4 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       </div>
     </div>
   );
-};
+});

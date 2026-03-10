@@ -238,6 +238,30 @@ let cache: {
 } | null = null;
 const CACHE_DURATION = 1000 * 60 * 60; // 60 minutes cache
 
+// Background refresh task
+const refreshCache = async () => {
+  try {
+    console.log("Refreshing feed cache in background...");
+    const allItems = await fetchFeeds();
+    const responseData = {
+      title: "Aggregated GCP Feeds",
+      description: "Aggregated news and updates from Google Cloud",
+      items: allItems
+    };
+    cache = {
+      data: responseData,
+      timestamp: Date.now()
+    };
+    console.log("Feed cache refreshed successfully.");
+  } catch (error) {
+    console.error("Error in background feed refresh:", error);
+  }
+};
+
+// Initial fetch and interval
+refreshCache();
+setInterval(refreshCache, CACHE_DURATION);
+
 // API Routes
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
@@ -248,20 +272,19 @@ app.get("/api/feed", async (req, res) => {
     // Set Cache-Control header for API response
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600'); // Cache for 5 mins (browser), 10 mins (CDN)
 
-    // Check cache
-    if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
+    // Return cache immediately if available
+    if (cache) {
       return res.json(cache.data);
     }
 
+    // Fallback if cache is not yet ready (e.g. immediately after server start)
     const allItems = await fetchFeeds();
-
     const responseData = {
       title: "Aggregated GCP Feeds",
       description: "Aggregated news and updates from Google Cloud",
       items: allItems
     };
 
-    // Update cache
     cache = {
       data: responseData,
       timestamp: Date.now()
@@ -281,10 +304,22 @@ app.get("/api/debug-key", (req, res) => {
   });
 });
 
+// In-memory cache for incidents
+let incidentsCache: {
+  data: any;
+  timestamp: number;
+} | null = null;
+const INCIDENTS_CACHE_DURATION = 1000 * 60 * 15; // 15 minutes cache
+
 app.get("/api/incidents", async (req, res) => {
   try {
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     
+    // Check cache
+    if (incidentsCache && (Date.now() - incidentsCache.timestamp < INCIDENTS_CACHE_DURATION)) {
+      return res.json(incidentsCache.data);
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
@@ -342,6 +377,12 @@ app.get("/api/incidents", async (req, res) => {
       if (!a.isActive && b.isActive) return 1;
       return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
     });
+
+    // Update cache
+    incidentsCache = {
+      data: incidents,
+      timestamp: Date.now()
+    };
 
     res.json(incidents);
   } catch (error) {

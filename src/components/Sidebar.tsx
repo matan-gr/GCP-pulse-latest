@@ -27,7 +27,7 @@ interface SidebarProps {
   isDesktopOpen: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
+export const Sidebar = React.memo<SidebarProps>(({ 
   activeTab, 
   setActiveTab, 
   isPresentationMode,
@@ -196,4 +196,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
     </>
   );
-};
+});
