@@ -107,12 +107,14 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         [Strategic analysis: Business value, roadmap alignment, cost implications, and competitive advantage.]
 
         ## ⚠️ Critical Deprecations & Breaking Changes (High Priority)
-        Present this section as a table followed by a detailed list for actionable items.
+        **MANDATORY:** You MUST present this section as a Markdown table. Do not use a list format for the summary.
         
         | Product Name | Description | Action Required By | Priority |
         | :--- | :--- | :--- | :--- |
         | [Name] | [Brief description] | [Date] | [High/Med] |
 
+        Follow the table with a detailed list for actionable items:
+        
         **Detailed Action Items:**
         *   **[Product Name]**: [Detailed description of change and impact]. **Action Required by:** [Date].
         *(Ensure this list is comprehensive by cross-referencing with Google Search)*

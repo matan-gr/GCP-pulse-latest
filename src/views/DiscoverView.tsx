@@ -176,15 +176,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         animate={{ y: 0, opacity: 1 }}
         className="sticky top-[72px] z-20"
       >
-        <div className="flex flex-col gap-4 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-[#3c4043]/50 shadow-lg transition-all">
+        <div className="flex flex-col gap-4 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg transition-all">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
-                <LayoutTemplate size={22} />
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
+                <LayoutTemplate size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight leading-none mb-1">Discover</h2>
-                <p className="text-[11px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-[0.2em]">Intelligence Feed</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight leading-none mb-1">Discover</h2>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Intelligence Feed</p>
               </div>
             </div>
 
@@ -194,22 +194,22 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleExportHTML}
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap bg-white dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] uppercase tracking-widest shadow-sm"
+                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap bg-white dark:bg-[#303134] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#3c4043] uppercase tracking-widest shadow-sm"
                 title="Export to HTML"
               >
                 <Download size={14} />
                 <span className="hidden sm:inline">Export</span>
               </motion.button>
 
-              <div className="w-px h-6 bg-[#dadce0] dark:bg-[#3c4043] mx-1" />
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
 
-              <div className="flex items-center bg-[#f1f3f4] dark:bg-[#303134] rounded-xl p-1 border border-transparent">
+              <div className="flex items-center bg-slate-100 dark:bg-[#303134] rounded-xl p-1 border border-transparent">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2.5 rounded-lg transition-all flex items-center space-x-2 ${
                     viewMode === 'grid' 
-                      ? 'bg-white dark:bg-[#202124] shadow-sm text-[#1a73e8] dark:text-[#8ab4f8]' 
-                      : 'text-[#5f6368] hover:text-[#202124] dark:text-[#9aa0a6] dark:hover:text-[#e8eaed]'
+                      ? 'bg-white dark:bg-[#202124] shadow-sm text-blue-600 dark:text-blue-400' 
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50'
                   }`}
                   title="Grid View"
                 >
@@ -220,8 +220,8 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                   onClick={() => setViewMode('list')}
                   className={`p-2.5 rounded-lg transition-all flex items-center space-x-2 ${
                     viewMode === 'list' 
-                      ? 'bg-white dark:bg-[#202124] shadow-sm text-[#1a73e8] dark:text-[#8ab4f8]' 
-                      : 'text-[#5f6368] hover:text-[#202124] dark:text-[#9aa0a6] dark:hover:text-[#e8eaed]'
+                      ? 'bg-white dark:bg-[#202124] shadow-sm text-blue-600 dark:text-blue-400' 
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50'
                   }`}
                   title="List View"
                 >
@@ -234,7 +234,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 
           {/* Quick Filter Chips */}
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-widest mr-2 whitespace-nowrap">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mr-2 whitespace-nowrap">
               <Filter size={12} />
               <span>Filters:</span>
             </div>
@@ -242,7 +242,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             {(search || prefs.filterCategories.length > 0) && (
               <button
                 onClick={onClearFilters}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-[#f1f3f4] dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#e8eaed] dark:hover:bg-[#3c4043] transition-all uppercase tracking-widest whitespace-nowrap active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-slate-100 dark:bg-[#303134] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-[#3c4043] transition-all uppercase tracking-widest whitespace-nowrap active:scale-95"
               >
                 <X size={12} />
                 <span>Clear All</span>
@@ -250,7 +250,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             )}
 
             {search && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black bg-[#1a73e8] text-white border border-[#1a73e8] shadow-sm whitespace-nowrap uppercase tracking-widest">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm whitespace-nowrap uppercase tracking-widest">
                 <Search size={12} />
                 <span>Search: {search}</span>
               </div>
@@ -265,9 +265,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                   className={cn(
                     "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black transition-all whitespace-nowrap border uppercase tracking-widest active:scale-95",
                     isActive
-                      ? `bg-[#1a73e8] text-white border-[#1a73e8] shadow-md scale-105 z-10`
+                      ? `bg-blue-600 text-white border-blue-600 shadow-md scale-105 z-10`
                       : cn(
-                          "bg-white dark:bg-[#202124] text-[#5f6368] dark:text-[#9aa0a6] border-[#dadce0] dark:border-[#3c4043] hover:border-[#bdc1c6] dark:hover:border-[#5f6368] hover:bg-[#f8f9fa] dark:hover:bg-[#303134]",
+                          "bg-white dark:bg-[#202124] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-[#303134]",
                           getCategoryStyles(name)
                         )
                   )}
@@ -277,7 +277,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                     "text-[9px] px-1.5 py-0.5 rounded-md font-black",
                     isActive
                       ? `bg-white/20 text-white`
-                      : `bg-[#f1f3f4] dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6]`
+                      : `bg-slate-100 dark:bg-[#303134] text-slate-500 dark:text-slate-400`
                   )}>
                     {count}
                   </span>
@@ -287,6 +287,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </div>
         </div>
       </motion.div>
+
 
       {/* Featured Section */}
       {!loading && featuredItems.length > 0 && viewMode === 'grid' && (

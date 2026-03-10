@@ -1,5 +1,5 @@
 /* Import Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -8,105 +8,57 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Space Grotesk', sans-serif;
+  --font-heading: 'Google Sans', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  /* Refined Google Palette */
+  /* Refined Google Enterprise Palette */
   --color-brand-primary: #1a73e8; /* Google Blue */
   --color-brand-secondary: #188038; /* Google Green */
-  --color-brand-accent: #ea4335; /* Google Red */
-  --color-brand-yellow: #fbbc04; /* Google Yellow */
+  --color-brand-accent: #d93025; /* Google Red (slightly muted) */
+  --color-brand-yellow: #f9ab00; /* Google Yellow (slightly muted) */
   
   /* Backgrounds - Light (Refined) */
-  --color-bg-app: #f8f9fa; /* Google Light Gray */
+  --color-bg-app: #f8f9fa; 
   --color-bg-card: #ffffff;
   --color-bg-sidebar: #f8f9fa;
   
   /* Backgrounds - Dark (Refined) */
-  --color-bg-app-dark: #202124; /* Google Dark Gray */
-  --color-bg-card-dark: #292a2d; /* Google Dark Surface */
+  --color-bg-app-dark: #202124; 
+  --color-bg-card-dark: #292a2d; 
   --color-bg-sidebar-dark: #202124;
 }
 
 body {
   font-family: var(--font-sans);
   @apply antialiased text-[#202124] dark:text-[#e8eaed] bg-[var(--color-bg-app)] dark:bg-[var(--color-bg-app-dark)];
-  /* Subtle dot pattern for sophistication */
-  background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.04) 1px, transparent 0);
-  background-size: 32px 32px;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-}
-
-@variant dark {
-  body {
-    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
-  }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-[#dadce0] dark:bg-[#5f6368] rounded-full hover:bg-[#bdc1c6] dark:hover:bg-[#80868b] transition-colors border-2 border-transparent bg-clip-padding;
+  @apply tracking-tight;
 }
 
 /* Component Classes */
 @layer components {
   .glass-card {
-    @apply bg-white dark:bg-[#292a2d] rounded-[24px] transition-all duration-300 border border-transparent dark:border-[#3c4043];
+    @apply bg-white dark:bg-[#292a2d] rounded-xl transition-all duration-300 border border-[#dadce0] dark:border-[#3c4043];
     box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
   }
   
-  .dark .glass-card {
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
-  }
-
   .glass-card:hover {
     box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
-    @apply border-[#dadce0] dark:border-[#5f6368];
-  }
-  
-  .dark .glass-card:hover {
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3), 0 4px 8px 3px rgba(0,0,0,0.15);
+    @apply border-[#1a73e8];
   }
 
   .sidebar-link {
-    @apply w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] hover:text-[#202124] dark:hover:text-[#e8eaed] font-medium text-sm tracking-tight;
+    @apply w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] hover:text-[#202124] dark:hover:text-[#e8eaed] font-medium text-sm;
   }
 
   .sidebar-link-active {
-    @apply bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 text-[#1a73e8] dark:text-[#8ab4f8] font-semibold hover:bg-[#d2e3fc] dark:hover:bg-[#8ab4f8]/20;
+    @apply bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 text-[#1a73e8] dark:text-[#8ab4f8] font-semibold;
   }
   
   .category-badge {
-    @apply px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 border border-[#dadce0] dark:border-[#5f6368] text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#292a2d] hover:bg-[#f8f9fa] dark:hover:bg-[#3c4043];
+    @apply px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wider transition-all duration-200 border border-[#dadce0] dark:border-[#5f6368] text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#3c4043];
   }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-}
-
-/* Animations */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.5s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
