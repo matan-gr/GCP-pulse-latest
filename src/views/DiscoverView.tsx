@@ -338,7 +338,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       {/* Unified Feed Layout */}
       <div id="feed-grid" className={`grid gap-4 sm:gap-6 md:gap-8 ${
         viewMode === 'grid' 
-          ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
           : 'grid-cols-1 max-w-4xl mx-auto'
       }`}>
         {loading ? (

@@ -41,14 +41,14 @@ export const StatusDashboard: React.FC<StatusDashboardProps> = ({
     .slice(0, 5);
 
   return (
-    <div className={`container mx-auto px-4 transition-all duration-500 ${isPresentationMode ? 'py-12' : 'mb-16'}`}>
+    <div className={`container mx-auto px-3 sm:px-4 transition-all duration-500 ${isPresentationMode ? 'py-8 sm:py-12' : 'mb-12 sm:mb-16'}`}>
       
       {/* Dashboard Header - Only visible in Presentation Mode */}
       {isPresentationMode && (
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-12 gap-6">
           <div>
-            <h1 className="text-3xl font-black text-[#202124] dark:text-[#e8eaed] tracking-tighter">Executive Briefing</h1>
-            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[15px] mt-2 font-medium">Real-time landscape analysis & system health</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#202124] dark:text-[#e8eaed] tracking-tighter">Executive Briefing</h1>
+            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[13px] sm:text-[15px] mt-1 sm:mt-2 font-medium">Real-time landscape analysis & system health</p>
           </div>
           <div className="flex items-center space-x-6">
             <div className="text-right">
@@ -67,12 +67,12 @@ export const StatusDashboard: React.FC<StatusDashboardProps> = ({
       )}
 
       {/* Main Grid */}
-      <div className={`grid gap-8 ${isPresentationMode ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+      <div className={`grid gap-4 sm:gap-6 md:gap-8 ${isPresentationMode ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
         
         {/* 1. System Health Card */}
         <motion.div 
           layout
-          className={`p-6 flex flex-col justify-between relative overflow-hidden border-t-4 rounded-[28px] shadow-sm bg-white dark:bg-[#202124] border border-[#dadce0] dark:border-[#3c4043] transition-all hover:shadow-md ${
+          className={`p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden border-t-4 rounded-[24px] sm:rounded-[28px] shadow-sm bg-white dark:bg-[#202124] border border-[#dadce0] dark:border-[#3c4043] transition-all hover:shadow-md ${
             hasActiveIncidents ? 'border-t-[#c5221f]' : 'border-t-[#1e8e3e]'
           } ${isPresentationMode ? 'h-64' : 'h-60'}`}
         >

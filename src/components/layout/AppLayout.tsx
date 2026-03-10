@@ -103,20 +103,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className={`flex-1 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'lg:ml-72' : ''}`}>
+      <div className={`flex-1 transition-all duration-300 min-w-0 ${!isPresentationMode && isDesktopSidebarOpen ? 'lg:ml-72' : ''}`}>
         
         {/* Top Header / Controls */}
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-xl border-b border-[#dadce0] dark:border-[#3c4043] h-14 flex items-center">
-          <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 flex items-center justify-between gap-4">
+          <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
             
             {/* Left: Menu & Title */}
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* Mobile Menu Trigger */}
               <button 
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden p-1.5 -ml-2 text-[#5f6368] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
+                className="lg:hidden p-2 -ml-1 text-[#5f6368] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
               >
-                <Menu size={18} />
+                <Menu size={20} />
               </button>
 
               {/* Desktop Sidebar Toggle */}
@@ -200,7 +200,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </header>
 
         {/* Mobile Search (visible only on small screens) */}
-        <div className="md:hidden px-4 py-2 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl">
+        <div className="md:hidden px-3 py-2 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl">
            {!isPresentationMode && activeTab !== 'tools' && (
               <GlobalSearch 
                 value={search} 
@@ -225,11 +225,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
            )}
         </div>
 
-        <div className="p-2 sm:p-3 md:p-4 pb-20 max-w-[1600px] mx-auto min-h-[calc(100vh-160px)]">
+        <div className="p-3 sm:p-4 md:p-6 pb-24 max-w-[1600px] mx-auto min-h-[calc(100vh-160px)]">
           {isAnyFilterActive && onClearFilters && (
-            <div className="mb-6 flex items-center justify-between p-4 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 border border-[#d2e3fc] dark:border-[#8ab4f8]/30 rounded-[24px] animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 border border-[#d2e3fc] dark:border-[#8ab4f8]/30 rounded-2xl sm:rounded-[24px] animate-in fade-in slide-in-from-top-2 duration-300 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#1a73e8] text-white rounded-full flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 bg-[#1a73e8] text-white rounded-full flex items-center justify-center shadow-sm shrink-0">
                   <Filter size={16} />
                 </div>
                 <div>
@@ -239,10 +239,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               </div>
               <button
                 onClick={onClearFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#292a2d] text-[#5f6368] dark:text-[#9aa0a6] text-[10px] font-bold rounded-full border border-[#dadce0] dark:border-[#5f6368] hover:bg-[#f8f9fa] dark:hover:bg-[#3c4043] transition-all shadow-sm active:scale-95 uppercase tracking-widest"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-[#292a2d] text-[#5f6368] dark:text-[#9aa0a6] text-[10px] font-bold rounded-full border border-[#dadce0] dark:border-[#5f6368] hover:bg-[#f8f9fa] dark:hover:bg-[#3c4043] transition-all shadow-sm active:scale-95 uppercase tracking-widest"
               >
                 <X size={12} />
-                <span>Clear</span>
+                <span>Clear All Filters</span>
               </button>
             </div>
           )}
@@ -250,13 +250,18 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </div>
 
         {/* Minimal Footer */}
-        <footer className={`fixed bottom-0 right-0 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-xl border-t border-[#dadce0] dark:border-[#3c4043] py-2 px-6 z-40 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'left-72' : 'left-0'}`}>
-          <div className="max-w-[1600px] mx-auto flex justify-between items-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6]">
-            <div className="flex items-center gap-4 uppercase tracking-widest">
-              <span className="flex items-center gap-1.5"><Database size={12} /> {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <footer className={`fixed bottom-0 right-0 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl border-t border-[#dadce0] dark:border-[#3c4043] py-2 px-4 sm:px-6 z-40 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'left-72' : 'left-0'}`}>
+          <div className="max-w-[1600px] mx-auto flex justify-between items-center text-[9px] sm:text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6]">
+            <div className="flex items-center gap-3 sm:gap-4 uppercase tracking-widest">
+              <span className="flex items-center gap-1.5"><Database size={10} className="sm:w-3 sm:h-3" /> {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="hidden xs:inline-block opacity-30">|</span>
+              <span className="hidden xs:inline-block">GCP Pulse v1.2</span>
             </div>
-            <span className="hidden sm:block text-right">
-              Developed by Matan Gravits. This application is an independent project and is not affiliated with, endorsed by, or a part of Google LLC or any Google products.
+            <span className="hidden md:block text-right max-w-[60%] truncate">
+              Developed by Matan Gravits. Independent project, not affiliated with Google LLC.
+            </span>
+            <span className="md:hidden text-right">
+              &copy; {new Date().getFullYear()}
             </span>
           </div>
         </footer>

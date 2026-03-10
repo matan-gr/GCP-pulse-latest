@@ -79,15 +79,15 @@ export const ToolsView: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Sidebar Navigation */}
-        <div className="lg:col-span-3 space-y-3 sticky top-24 self-start">
+        <div className="lg:col-span-3 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible no-scrollbar pb-4 lg:pb-0 sticky top-24 self-start">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
-              className={`w-full text-left p-4 rounded-xl transition-all duration-200 group relative overflow-hidden ${
+              className={`flex-shrink-0 w-[280px] lg:w-full text-left p-4 rounded-xl transition-all duration-200 group relative overflow-hidden ${
                 activeTool === tool.id
                   ? 'bg-white dark:bg-slate-800 shadow-md ring-1 ring-slate-200 dark:ring-slate-700'
-                  : 'hover:bg-white/50 dark:hover:bg-slate-800/50 hover:shadow-sm'
+                  : 'bg-white/30 dark:bg-slate-800/30 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:shadow-sm border border-slate-100 dark:border-slate-800'
               }`}
             >
               <div className="flex items-start space-x-4 relative z-10">

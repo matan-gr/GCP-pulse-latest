@@ -69,14 +69,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800"
-      >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
-
       {/* Sidebar Container */}
       <AnimatePresence>
         {((isDesktop && isDesktopOpen) || (!isDesktop && isOpen)) && (
@@ -88,13 +80,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className={`fixed top-0 left-0 h-full w-72 bg-[var(--color-bg-sidebar)] dark:bg-[var(--color-bg-sidebar-dark)] border-r border-[#dadce0] dark:border-[#3c4043] z-[50] flex flex-col`}
           >
             {/* Logo Area */}
-            <div className="h-16 flex items-center px-8 border-b border-[#dadce0] dark:border-[#3c4043]">
+            <div className="h-16 flex items-center justify-between px-6 border-b border-[#dadce0] dark:border-[#3c4043]">
               <div className="flex items-center space-x-2 group cursor-pointer">
                 <div className="w-8 h-8 bg-[#1a73e8] rounded-full flex items-center justify-center">
                   <Zap size={18} className="text-white" />
                 </div>
                 <span className="text-lg font-medium text-[#202124] dark:text-[#e8eaed] tracking-tight">GCP Pulse</span>
               </div>
+
+              {/* Mobile Close Button */}
+              {!isDesktop && (
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 text-[#5f6368] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
+                >
+                  <X size={20} />
+                </button>
+              )}
             </div>
 
             {/* Navigation */}

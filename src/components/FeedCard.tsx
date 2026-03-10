@@ -222,23 +222,23 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
            </span>
         </div>
 
-        <div className={`${isCompact ? 'p-4' : 'p-5'} flex flex-col flex-1 relative`}>
+        <div className={`${isCompact ? 'p-3' : 'p-4 sm:p-5'} flex flex-col flex-1 relative`}>
           {item.serviceName && (
-            <div className="mb-3">
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#f1f3f4] dark:bg-[#3c4043] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368]">
-                <Box size={12} className="mr-1.5" />
+            <div className="mb-2 sm:mb-3">
+              <span className="inline-flex items-center px-2 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#f1f3f4] dark:bg-[#3c4043] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368]">
+                <Box size={10} className="sm:w-3 sm:h-3 mr-1 sm:mr-1.5" />
                 {item.serviceName}
               </span>
             </div>
           )}
 
-          <h3 className={`font-semibold text-[#202124] dark:text-[#e8eaed] mb-1.5 z-10 relative ${isPresentationMode ? 'text-md' : isCompact ? 'text-[14px]' : 'text-[15px]'} leading-snug`}>
+          <h3 className={`font-semibold text-[#202124] dark:text-[#e8eaed] mb-1 sm:mb-1.5 z-10 relative ${isPresentationMode ? 'text-md' : isCompact ? 'text-[13px] sm:text-[14px]' : 'text-[14px] sm:text-[15px]'} leading-snug`}>
             <a href={item.link} target="_blank" rel="noopener noreferrer" className={`hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] transition-colors`}>
               {item.title}
             </a>
           </h3>
 
-          <p className={`text-[#5f6368] dark:text-[#9aa0a6] text-[13px] mb-4 z-10 relative flex-1 leading-relaxed ${isPresentationMode ? 'line-clamp-4' : 'line-clamp-3'}`}>
+          <p className={`text-[#5f6368] dark:text-[#9aa0a6] text-[12px] sm:text-[13px] mb-3 sm:mb-4 z-10 relative flex-1 leading-relaxed ${isPresentationMode ? 'line-clamp-4' : 'line-clamp-3'}`}>
             {item.contentSnippet}
           </p>
 
@@ -299,7 +299,7 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
         {/* Image Section */}
         {image && !isPresentationMode && showImages && (
           <div 
-            className={`${isListView ? 'w-56 min-w-[224px]' : isCompact ? 'h-32' : 'h-40'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
+            className={`${isListView ? 'w-full sm:w-56 min-w-0 sm:min-w-[224px]' : isCompact ? 'h-32' : 'h-40 sm:h-48'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
             onClick={(e) => {
               e.stopPropagation();
               onSummarize(item);
@@ -332,10 +332,10 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
           </div>
         )}
         
-          <div className={`${isCompact ? 'p-3' : 'p-3 sm:p-4'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
+          <div className={`${isCompact ? 'p-3' : 'p-3 sm:p-5'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
           <div className="w-full">
-            <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-1.5' : 'mb-2'}`}>
-               <div className="flex items-center space-x-1.5">
+            <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-1' : 'mb-2'}`}>
+               <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
                   {isNew && !isPresentationMode && (
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0 rounded text-[8px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-800 uppercase tracking-widest">
                       <Sparkles size={8} />
@@ -356,12 +356,12 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                     </span>
                   )}
                </div>
-               <span className="text-[8px] text-[#5f6368] dark:text-[#9aa0a6] font-bold uppercase tracking-[0.2em] tabular-nums">
+               <span className="text-[8px] text-[#5f6368] dark:text-[#9aa0a6] font-bold uppercase tracking-[0.2em] tabular-nums shrink-0 ml-2">
                   {date}
                </span>
             </div>
             
-            <h3 className={`font-heading font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-1.5 text-[14px]' : 'mb-1.5 text-[15px] sm:text-[16px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
+            <h3 className={`font-heading font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-1 text-[13px] sm:text-[14px]' : 'mb-1.5 text-[14px] sm:text-[16px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
                 <a href={item.link} target="_blank" rel="noopener noreferrer" className="focus:outline-none">
                     {item.title}
                 </a>
