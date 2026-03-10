@@ -49,6 +49,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 }) => {
   // View Customization State
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Filter and organize items for the Discover feed
   const allFeedItems = useMemo(() => {
@@ -172,23 +173,31 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 
       {/* View Customization Toolbar */}
       <motion.div 
-        initial={{ y: -10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="sticky top-[72px] z-20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
-        <div className="flex flex-col gap-4 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg transition-all">
+        <div className="flex flex-col gap-3 bg-white dark:bg-[#202124] p-4 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
-                <LayoutTemplate size={24} />
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
+                <LayoutTemplate size={20} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight leading-none mb-1">Discover</h2>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Intelligence Feed</p>
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-50 tracking-tight leading-none mb-0.5">Discover</h2>
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Intelligence Feed</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-[10px] font-bold transition-all bg-slate-100 dark:bg-[#303134] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-[#3c4043] uppercase tracking-widest"
+              >
+                <Filter size={12} />
+                <span>{isFiltersOpen ? 'Hide Filters' : 'Show Filters'}</span>
+              </button>
+
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
               {/* Export Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -233,58 +242,64 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </div>
 
           {/* Quick Filter Chips */}
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mr-2 whitespace-nowrap">
-              <Filter size={12} />
-              <span>Filters:</span>
-            </div>
-            
-            {(search || prefs.filterCategories.length > 0) && (
-              <button
-                onClick={onClearFilters}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-slate-100 dark:bg-[#303134] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-[#3c4043] transition-all uppercase tracking-widest whitespace-nowrap active:scale-95"
+          <AnimatePresence>
+            {isFiltersOpen && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
               >
-                <X size={12} />
-                <span>Clear All</span>
-              </button>
-            )}
-
-            {search && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm whitespace-nowrap uppercase tracking-widest">
-                <Search size={12} />
-                <span>Search: {search}</span>
-              </div>
-            )}
-
-            {popularCategories.map(({ name, count }) => {
-              const isActive = prefs.filterCategories.includes(name);
-              return (
-                <button
-                  key={name}
-                  onClick={() => handleCategoryChange(name)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black transition-all whitespace-nowrap border uppercase tracking-widest active:scale-95",
-                    isActive
-                      ? `bg-blue-600 text-white border-blue-600 shadow-md scale-105 z-10`
-                      : cn(
-                          "bg-white dark:bg-[#202124] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-[#303134]",
-                          getCategoryStyles(name)
-                        )
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 border-t border-slate-100 dark:border-slate-800">
+                  {(search || prefs.filterCategories.length > 0) && (
+                    <button
+                      onClick={onClearFilters}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black bg-slate-100 dark:bg-[#303134] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-[#3c4043] transition-all uppercase tracking-widest whitespace-nowrap"
+                    >
+                      <X size={10} />
+                      <span>Clear All</span>
+                    </button>
                   )}
-                >
-                  <span>{name}</span>
-                  <span className={cn(
-                    "text-[9px] px-1.5 py-0.5 rounded-md font-black",
-                    isActive
-                      ? `bg-white/20 text-white`
-                      : `bg-slate-100 dark:bg-[#303134] text-slate-500 dark:text-slate-400`
-                  )}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+
+                  {search && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black bg-blue-600 text-white border border-blue-600 whitespace-nowrap uppercase tracking-widest">
+                      <Search size={10} />
+                      <span>Search: {search}</span>
+                    </div>
+                  )}
+
+                  {popularCategories.map(({ name, count }) => {
+                    const isActive = prefs.filterCategories.includes(name);
+                    return (
+                      <button
+                        key={name}
+                        onClick={() => handleCategoryChange(name)}
+                        className={cn(
+                          "flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black transition-all whitespace-nowrap border uppercase tracking-widest",
+                          isActive
+                            ? `bg-blue-600 text-white border-blue-600`
+                            : cn(
+                                "bg-white dark:bg-[#202124] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-[#303134]",
+                                getCategoryStyles(name)
+                              )
+                        )}
+                      >
+                        <span>{name}</span>
+                        <span className={cn(
+                          "text-[8px] px-1 py-0.5 rounded-sm font-black",
+                          isActive
+                            ? `bg-white/20 text-white`
+                            : `bg-slate-100 dark:bg-[#303134] text-slate-500 dark:text-slate-400`
+                        )}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
