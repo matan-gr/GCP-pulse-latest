@@ -174,8 +174,8 @@ export const Sidebar = React.memo<SidebarProps>(({
             </nav>
             
             {/* Sidebar Footer */}
-            <div className="p-4 border-t border-[#dadce0] dark:border-[#3c4043]">
-               <div className="flex items-center justify-between px-2">
+            <div className="h-16 flex items-center border-t border-[#dadce0] dark:border-[#3c4043] px-6">
+               <div className="flex items-center justify-between w-full">
                   <div className="flex items-center space-x-2 text-[11px] font-semibold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">
                     <div className="w-2 h-2 rounded-full bg-[#188038] animate-pulse" />
                     <span>Live</span>

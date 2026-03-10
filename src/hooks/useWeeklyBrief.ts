@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FeedItem } from '../types';
 import { toast } from 'sonner';
 import { getAiInstance } from '../services/geminiService';
+import { checkRateLimit, recordUsage, getRemainingTime } from '../utils/rateLimiter';
 
 export const useWeeklyBrief = (items: FeedItem[]) => {
   const [brief, setBrief] = useState<string | null>(null);
@@ -11,6 +12,29 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
 
   const generateBrief = useCallback(async (force = false) => {
     if (loading || items.length === 0) return;
+
+    if (!force) {
+      const cached = localStorage.getItem('weekly_brief_cache');
+      if (cached) {
+        try {
+          const { content, timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          if (age < 60 * 60 * 1000) { // 60 minutes
+            setBrief(content);
+            setLastUpdated(new Date(timestamp));
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse cached brief", e);
+        }
+      }
+    }
+
+    if (!checkRateLimit('weekly_brief', 10, 90)) {
+      const waitTime = getRemainingTime('weekly_brief', 10, 90);
+      toast.error("Rate limit exceeded", { description: `Please wait ${waitTime} minutes before generating another weekly brief.` });
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -135,6 +159,13 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         setBrief(text);
         const now = new Date();
         setLastUpdated(now);
+        
+        recordUsage('weekly_brief', 90);
+        
+        localStorage.setItem('weekly_brief_cache', JSON.stringify({
+          content: text,
+          timestamp: now.getTime()
+        }));
       } else {
         throw new Error("No content generated");
       }
@@ -148,9 +179,21 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
     }
   }, [items, loading]);
 
-  // Removed cache loading on mount
   useEffect(() => {
-    // Intentionally left blank as cache is disabled
+    const cached = localStorage.getItem('weekly_brief_cache');
+    if (cached) {
+      try {
+        const { content, timestamp } = JSON.parse(cached);
+        const age = Date.now() - timestamp;
+        if (age < 60 * 60 * 1000) { // 60 minutes
+          setBrief(content);
+          setLastUpdated(new Date(timestamp));
+        }
+      } catch (e) {
+        console.error("Failed to parse cached brief", e);
+        localStorage.removeItem('weekly_brief_cache');
+      }
+    }
   }, []);
 
   return {

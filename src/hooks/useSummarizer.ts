@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { FeedItem, AnalysisResult } from '../types';
 import { extractGCPProducts } from '../utils';
 import { getAiInstance } from '../services/geminiService';
+import { checkRateLimit, recordUsage, getRemainingTime } from '../utils/rateLimiter';
 
 export const useSummarizer = () => {
   const [summarizingId, setSummarizingId] = useState<string | null>(null);
@@ -24,6 +25,12 @@ export const useSummarizer = () => {
         analysis: analyses[item.link],
         isStreaming: false
       });
+      return;
+    }
+
+    if (!checkRateLimit('summarization', 10, 30)) {
+      const waitTime = getRemainingTime('summarization', 10, 30);
+      toast.error("Rate limit exceeded", { description: `Please wait ${waitTime} minutes before summarizing another article.` });
       return;
     }
 
@@ -156,6 +163,8 @@ export const useSummarizer = () => {
         analysis: analysis,
         streamContent: undefined 
       } : null);
+      
+      recordUsage('summarization', 30);
       
       toast.success("Analysis complete!", { description: "Insights are ready to view." });
     } catch (e: any) {
