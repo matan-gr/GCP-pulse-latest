@@ -276,125 +276,118 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
   // Standard Feed Card Design
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className={cn(
-        "flex group relative rounded-[24px] overflow-hidden transition-all duration-300 glass-card",
-        isListView ? "flex-row min-h-[140px]" : "flex-col h-full",
-        isSaved && "ring-2 ring-[#1a73e8] ring-offset-2 dark:ring-offset-[#202124]",
-        "border-l-4",
-        getBorderColor(item.source),
-        "hover:-translate-y-1"
-      )}
-    >
-      {/* Deprecation Warning Banner */}
-      {isDeprecation && daysUntilEOL > 0 && (
-        <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider flex items-center justify-between border-b ${urgencyColor}`}>
-          <span className="flex items-center">
-            <AlertOctagon size={12} className="mr-2" />
-            Deprecation Notice
-          </span>
-          <span>{daysUntilEOL} Days Left</span>
-        </div>
-      )}
-
-      {/* Image Section */}
-      {image && !isPresentationMode && showImages && (
-        <div 
-          className={`${isListView ? 'w-56 min-w-[224px]' : isCompact ? 'h-36' : 'h-48'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onSummarize(item);
-          }}
-        >
-            <img 
-                src={image} 
-                alt={item.title} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-                loading="lazy"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/5 transition-colors duration-300" />
-            
-            {item.videoId && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-lg group-hover/image:scale-110 transition-transform duration-300">
-                  <Play size={18} className="text-white ml-1 fill-white" />
-                </div>
-              </div>
-            )}
-
-            {item.duration && (
-              <div className="absolute bottom-3 right-3 z-20">
-                <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-black/70 text-white backdrop-blur-md">
-                  {item.duration}
-                </span>
-              </div>
-            )}
-        </div>
-      )}
-      
-        <div className={`${isCompact ? 'p-4' : 'p-5'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
-        <div className="w-full">
-          <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-3' : 'mb-3'}`}>
-             <div className="flex items-center space-x-2">
-                {isNew && !isPresentationMode && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-[#e8f0fe] text-[#1a73e8] dark:bg-[#8ab4f8]/20 dark:text-[#8ab4f8] border border-[#d2e3fc] dark:border-[#8ab4f8]/30 uppercase tracking-widest">
-                    <Sparkles size={10} className="text-[#1a73e8] dark:text-[#8ab4f8]" />
-                    NEW
-                  </span>
-                )}
-                <span className={cn(
-                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all duration-300 hover:shadow-sm",
-                  getSourceStyles(item.source)
-                )}>
-                  <SourceIcon source={item.source} />
-                  {item.source}
-                </span>
-                {isTrending && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-[#f1f3f4] text-[#5f6368] dark:bg-[#3c4043] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368] uppercase tracking-widest">
-                    <TrendingUp size={10} />
-                    TRENDING
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-black text-[#5f6368] dark:text-[#9aa0a6] bg-[#f1f3f4] dark:bg-[#3c4043] border border-[#dadce0] dark:border-[#5f6368]/30 uppercase tracking-widest">
-                  <Clock size={10} />
-                  {readingTime}m
-                </span>
-             </div>
-             <span className="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] font-black uppercase tracking-[0.2em] tabular-nums">
-                {date}
-             </span>
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+        className={cn(
+          "flex group relative rounded-3xl overflow-hidden transition-all duration-300 bg-white dark:bg-[#202124] border border-[#dadce0] dark:border-[#3c4043] shadow-sm hover:shadow-xl hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30",
+          isListView ? "flex-row min-h-[160px]" : "flex-col h-full",
+          isSaved && "ring-2 ring-[#1a73e8] ring-offset-2 dark:ring-offset-[#202124]",
+        )}
+      >
+        {/* Deprecation Warning Banner */}
+        {isDeprecation && daysUntilEOL > 0 && (
+          <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider flex items-center justify-between border-b ${urgencyColor}`}>
+            <span className="flex items-center">
+              <AlertOctagon size={12} className="mr-2" />
+              Deprecation Notice
+            </span>
+            <span>{daysUntilEOL} Days Left</span>
           </div>
-          
-          <h3 className={`font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-2 text-[15px]' : 'mb-2 text-[17px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
-              <a href={item.link} target="_blank" rel="noopener noreferrer" className="focus:outline-none">
-                  {item.title}
-              </a>
-          </h3>
+        )}
+  
+        {/* Image Section */}
+        {image && !isPresentationMode && showImages && (
+          <div 
+            className={`${isListView ? 'w-64 min-w-[256px]' : isCompact ? 'h-40' : 'h-52'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSummarize(item);
+            }}
+          >
+              <img 
+                  src={image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/5 transition-colors duration-300" />
+              
+              {item.videoId && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-lg group-hover/image:scale-110 transition-transform duration-300">
+                    <Play size={20} className="text-white ml-1 fill-white" />
+                  </div>
+                </div>
+              )}
+  
+              {item.duration && (
+                <div className="absolute bottom-3 right-3 z-20">
+                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black/70 text-white backdrop-blur-md">
+                    {item.duration}
+                  </span>
+                </div>
+              )}
+          </div>
+        )}
+        
+          <div className={`${isCompact ? 'p-4' : 'p-4 sm:p-5 md:p-6'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
+          <div className="w-full">
+            <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-2' : 'mb-3'}`}>
+               <div className="flex items-center space-x-2">
+                  {isNew && !isPresentationMode && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-800 uppercase tracking-widest">
+                      <Sparkles size={9} />
+                      NEW
+                    </span>
+                  )}
+                  <span className={cn(
+                    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border transition-all duration-300",
+                    getSourceStyles(item.source)
+                  )}>
+                    <SourceIcon source={item.source} size={10} />
+                    {item.source}
+                  </span>
+                  {isTrending && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 border border-orange-100 dark:border-orange-800 uppercase tracking-widest">
+                      <TrendingUp size={9} />
+                      TRENDING
+                    </span>
+                  )}
+               </div>
+               <span className="text-[9px] text-[#5f6368] dark:text-[#9aa0a6] font-bold uppercase tracking-[0.2em] tabular-nums">
+                  {date}
+               </span>
+            </div>
+            
+            <h3 className={`font-heading font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-2 text-[15px]' : 'mb-2 text-[16px] sm:text-[18px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="focus:outline-none">
+                    {item.title}
+                </a>
+            </h3>
 
           {item.channelName && (
-            <div className="mb-3 flex items-center text-[12px] text-[#5f6368] dark:text-[#9aa0a6]">
-              <Youtube size={14} className="mr-1.5 text-[#ea4335]" />
+            <div className="mb-2 flex items-center text-[11px] text-[#5f6368] dark:text-[#9aa0a6]">
+              <Youtube size={12} className="mr-1.5 text-[#ea4335]" />
               <span className="font-medium">{item.channelName}</span>
             </div>
           )}
 
           {/* Product Labels for Release Notes */}
           {(item.source === 'Release Notes' || item.source === 'Gemini Enterprise') && displayLabels.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-1.5">
+            <div className="mb-2 flex flex-wrap gap-1.5">
               {displayLabels.slice(0, 3).map((label) => (
-                <span key={label} className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-[#f1f3f4] text-[#5f6368] dark:bg-[#3c4043] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368] uppercase tracking-widest transition-all hover:bg-[#e8f0fe] hover:text-[#1a73e8] hover:border-[#d2e3fc]">
-                  <Tag size={10} className="mr-1.5 opacity-70" />
+                <span key={label} className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black bg-[#f1f3f4] text-[#5f6368] dark:bg-[#3c4043] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368] uppercase tracking-widest transition-all hover:bg-[#e8f0fe] hover:text-[#1a73e8] hover:border-[#d2e3fc]">
+                  <Tag size={9} className="mr-1.5 opacity-70" />
                   {label}
                 </span>
               ))}
             </div>
           )}
           
-          <div className={`relative ${isCompact ? 'mb-2' : 'mb-3'}`}>
-            <div className={`text-[#5f6368] dark:text-[#9aa0a6] ${isCompact ? 'text-[13px] leading-relaxed line-clamp-2' : 'text-[14px] leading-relaxed'} ${!isExpanded && !isCompact && !isPresentationMode ? 'line-clamp-3' : ''} prose dark:prose-invert max-w-none prose-p:my-0`}>
+          <div className={`relative ${isCompact ? 'mb-2' : 'mb-2'}`}>
+            <div className={`text-[#5f6368] dark:text-[#9aa0a6] ${isCompact ? 'text-[12px] leading-relaxed line-clamp-2' : 'text-[13px] sm:text-[14px] leading-relaxed'} ${!isExpanded && !isCompact && !isPresentationMode ? 'line-clamp-2 sm:line-clamp-3' : ''} prose dark:prose-invert max-w-none prose-p:my-0`}>
                 <ReactMarkdown 
                   components={markdownComponents}
                 >
@@ -408,12 +401,12 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                   e.preventDefault();
                   setIsExpanded(!isExpanded);
                 }}
-                className="text-[10px] font-bold text-[#5f6368] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] mt-1.5 flex items-center focus:outline-none uppercase tracking-widest transition-colors"
+                className="text-[9px] font-bold text-[#5f6368] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] mt-1 flex items-center focus:outline-none uppercase tracking-widest transition-colors"
               >
                 {isExpanded ? (
-                  <>Less <ChevronUp size={12} className="ml-0.5" /></>
+                  <>Less <ChevronUp size={10} className="ml-0.5" /></>
                 ) : (
-                  <>More <ChevronDown size={12} className="ml-0.5" /></>
+                  <>More <ChevronDown size={10} className="ml-0.5" /></>
                 )}
               </button>
             )}

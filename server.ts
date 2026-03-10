@@ -236,7 +236,7 @@ let cache: {
   data: any;
   timestamp: number;
 } | null = null;
-const CACHE_DURATION = 1000 * 60 * 5; // 5 minutes cache
+const CACHE_DURATION = 1000 * 60 * 60; // 60 minutes cache
 
 // API Routes
 app.get("/api/health", (req, res) => {

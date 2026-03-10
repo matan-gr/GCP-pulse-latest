@@ -225,7 +225,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
            )}
         </div>
 
-        <div className="p-4 sm:p-6 pb-24 max-w-[1600px] mx-auto min-h-[calc(100vh-200px)]">
+        <div className="p-3 sm:p-4 md:p-6 pb-24 max-w-[1600px] mx-auto min-h-[calc(100vh-200px)]">
           {isAnyFilterActive && onClearFilters && (
             <div className="mb-6 flex items-center justify-between p-4 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 border border-[#d2e3fc] dark:border-[#8ab4f8]/30 rounded-[24px] animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center gap-3">

@@ -42,13 +42,13 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md p-6 rounded-3xl border border-white/20 dark:border-[#3c4043]/50 shadow-lg">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Youtube className="w-6 h-6 text-red-500" />
+          <h2 className="text-2xl font-heading font-bold text-[#202124] dark:text-slate-100 flex items-center gap-3">
+            <Youtube className="w-8 h-8 text-red-500" />
             Google Cloud YouTube
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-[#5f6368] dark:text-slate-400 mt-2 text-sm">
             Latest videos, tutorials, and announcements from Google Cloud.
           </p>
         </div>
@@ -56,7 +56,7 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
           href="https://www.youtube.com/@googlecloud" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-sm font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 border border-red-100 dark:border-red-500/20"
+          className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-sm active:scale-95 border border-red-100 dark:border-red-500/20"
         >
           Visit Channel
           <ExternalLink className="w-4 h-4" />
@@ -70,7 +70,7 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all"
+            className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl overflow-hidden border border-[#dadce0] dark:border-[#3c4043] shadow-sm hover:shadow-xl hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 transition-all"
           >
             {item.videoId ? (
               <a 
@@ -91,8 +91,8 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
                   </div>
                 </div>
                 {item.duration && (
-                  <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/80 text-white text-[10px] font-bold rounded flex items-center gap-1">
-                    <Clock size={10} />
+                  <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-black/80 text-white text-[10px] font-bold rounded-lg flex items-center gap-1.5 backdrop-blur-md">
+                    <Clock size={12} />
                     {item.duration}
                   </div>
                 )}
@@ -110,28 +110,28 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
               </a>
             )}
             
-            <div className="p-5 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow">
               <a 
                 href={item.link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 hover:text-red-600 dark:hover:text-red-400 transition-colors mb-2"
+                className="font-heading font-semibold text-[#202124] dark:text-slate-100 line-clamp-2 hover:text-red-600 dark:hover:text-red-400 transition-colors mb-3 text-lg leading-snug"
               >
                 {item.title}
               </a>
 
               {item.description && (
-                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                <p className="text-sm text-[#5f6368] dark:text-slate-400 line-clamp-2 mb-5 leading-relaxed">
                   {item.description}
                 </p>
               )}
               
               <div className="mt-auto flex flex-col gap-3">
                 {item.categories && item.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {item.categories.slice(0, 3).map(cat => (
                       <span key={cat} className={cn(
-                        "px-2 py-0.5 text-[9px] font-black rounded-lg uppercase tracking-widest border transition-all duration-300",
+                        "px-3 py-1 text-[10px] font-bold rounded-lg uppercase tracking-widest border transition-all duration-300",
                         getCategoryStyles(cat)
                       )}>
                         {cat}

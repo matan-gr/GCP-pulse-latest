@@ -89,19 +89,19 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
       </div>
 
       {/* Controls */}
-      <div className="sticky top-[72px] z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
-        <div className="flex items-center space-x-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 custom-scrollbar">
-          <div className="mr-3 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500">
+      <div className="sticky top-[72px] z-20 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-[#3c4043]/50 shadow-lg flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
+        <div className="flex items-center space-x-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
+          <div className="mr-3 p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
             <Filter size={18} />
           </div>
           {(['All', 'Critical', 'High', 'Medium', 'Low'] as const).map(sev => (
             <button
               key={sev}
               onClick={() => setSeverityFilter(sev)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+              className={`px-5 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                 severityFilter === sev 
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md transform scale-105' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-[#1a73e8] text-white shadow-md scale-105' 
+                  : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043]'
               }`}
             >
               {sev}
@@ -110,13 +110,13 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
         </div>
 
         <div className="relative w-full md:w-80 group">
-          <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+          <Search size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
             placeholder="Search bulletins, CVEs, products..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium"
+            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-[#303134] border border-[#dadce0] dark:border-[#3c4043] rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium"
           />
         </div>
       </div>
@@ -167,34 +167,34 @@ const SecurityItemCard = ({ item, index, onSummarize, summarizingId }: { item: F
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ delay: index * 0.05 }}
       onClick={() => window.open(item.link, '_blank')}
-      className={`group relative rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-lg bg-white dark:bg-slate-900 cursor-pointer ${
-        item.severity === 'Critical' ? 'border-l-[6px] border-l-red-500 border-slate-200 dark:border-slate-800' :
-        item.severity === 'High' ? 'border-l-[6px] border-l-orange-500 border-slate-200 dark:border-slate-800' :
-        item.severity === 'Medium' ? 'border-l-[6px] border-l-yellow-500 border-slate-200 dark:border-slate-800' :
-        'border-l-[6px] border-l-blue-500 border-slate-200 dark:border-slate-800'
+      className={`group relative rounded-3xl border shadow-sm overflow-hidden transition-all hover:shadow-xl bg-white dark:bg-[#202124] cursor-pointer border-[#dadce0] dark:border-[#3c4043] hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 ${
+        item.severity === 'Critical' ? 'border-l-[6px] border-l-red-500' :
+        item.severity === 'High' ? 'border-l-[6px] border-l-orange-500' :
+        item.severity === 'Medium' ? 'border-l-[6px] border-l-yellow-500' :
+        'border-l-[6px] border-l-blue-500'
       }`}
     >
-      <div className="p-6">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-          <div className="space-y-3 flex-1">
+      <div className="p-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
+          <div className="space-y-4 flex-1">
             <div className="flex items-center gap-3 flex-wrap">
               <SeverityBadge severity={item.severity} />
-              <span className="text-xs font-medium text-slate-500 flex items-center bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">
+              <span className="text-[11px] font-bold text-[#5f6368] dark:text-[#9aa0a6] flex items-center bg-[#f1f3f4] dark:bg-[#3c4043] px-3 py-1 rounded-lg uppercase tracking-widest">
                 {new Date(item.isoDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
               </span>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <h3 className="text-2xl font-heading font-bold text-[#202124] dark:text-slate-100 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                 {item.title}
               </a>
             </h3>
           </div>
           
-          <div className="flex items-center gap-2 flex-shrink-0 self-start">
+          <div className="flex items-center gap-3 flex-shrink-0 self-start">
             <button 
               onClick={(e) => { e.stopPropagation(); onSummarize(item); }}
               disabled={summarizingId === item.link}
-              className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-900/20 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-bold transition-all disabled:opacity-50 border border-blue-100 dark:border-blue-800/50 shadow-sm hover:shadow"
+              className="flex items-center px-5 py-2.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50 border border-blue-100 dark:border-blue-800/50 shadow-sm hover:shadow"
             >
               <Zap size={14} className={`mr-2 ${summarizingId === item.link ? 'animate-spin' : 'fill-blue-500 text-blue-600'}`} />
               {summarizingId === item.link ? 'Analyzing...' : 'AI Analysis'}
@@ -204,7 +204,7 @@ const SecurityItemCard = ({ item, index, onSummarize, summarizingId }: { item: F
               target="_blank" 
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+              className="p-3 text-[#5f6368] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors"
               title="View Official Bulletin"
             >
               <ExternalLink size={20} />

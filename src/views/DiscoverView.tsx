@@ -176,15 +176,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         animate={{ y: 0, opacity: 1 }}
         className="sticky top-[72px] z-20"
       >
-        <div className="flex flex-col gap-4 bg-white dark:bg-[#202124] p-4 rounded-[24px] border border-[#dadce0] dark:border-[#3c4043] shadow-sm transition-all">
+        <div className="flex flex-col gap-4 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-[#3c4043]/50 shadow-lg transition-all">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-[#f1f3f4] dark:bg-[#303134] rounded-xl text-[#5f6368] dark:text-[#9aa0a6]">
-                <LayoutTemplate size={20} />
+              <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
+                <LayoutTemplate size={22} />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight leading-none mb-1">Discover</h2>
-                <p className="text-[10px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-widest">Intelligence Feed</p>
+                <h2 className="text-lg font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight leading-none mb-1">Discover</h2>
+                <p className="text-[11px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-[0.2em]">Intelligence Feed</p>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleExportHTML}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-[11px] font-black transition-all whitespace-nowrap bg-[#f8f9fa] dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] uppercase tracking-widest shadow-sm"
+                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap bg-white dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#3c4043] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] uppercase tracking-widest shadow-sm"
                 title="Export to HTML"
               >
                 <Download size={14} />
@@ -203,30 +203,30 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 
               <div className="w-px h-6 bg-[#dadce0] dark:bg-[#3c4043] mx-1" />
 
-              <div className="flex items-center bg-[#f1f3f4] dark:bg-[#303134] rounded-lg p-1 border border-transparent">
+              <div className="flex items-center bg-[#f1f3f4] dark:bg-[#303134] rounded-xl p-1 border border-transparent">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-all flex items-center space-x-1.5 ${
+                  className={`p-2.5 rounded-lg transition-all flex items-center space-x-2 ${
                     viewMode === 'grid' 
                       ? 'bg-white dark:bg-[#202124] shadow-sm text-[#1a73e8] dark:text-[#8ab4f8]' 
                       : 'text-[#5f6368] hover:text-[#202124] dark:text-[#9aa0a6] dark:hover:text-[#e8eaed]'
                   }`}
                   title="Grid View"
                 >
-                  <Grid size={16} />
-                  <span className="text-[11px] font-black hidden lg:inline uppercase tracking-widest">Grid</span>
+                  <Grid size={18} />
+                  <span className="text-[11px] font-bold hidden lg:inline uppercase tracking-widest">Grid</span>
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-all flex items-center space-x-1.5 ${
+                  className={`p-2.5 rounded-lg transition-all flex items-center space-x-2 ${
                     viewMode === 'list' 
                       ? 'bg-white dark:bg-[#202124] shadow-sm text-[#1a73e8] dark:text-[#8ab4f8]' 
                       : 'text-[#5f6368] hover:text-[#202124] dark:text-[#9aa0a6] dark:hover:text-[#e8eaed]'
                   }`}
                   title="List View"
                 >
-                  <AlignJustify size={16} />
-                  <span className="text-[11px] font-black hidden lg:inline uppercase tracking-widest">List</span>
+                  <AlignJustify size={18} />
+                  <span className="text-[11px] font-bold hidden lg:inline uppercase tracking-widest">List</span>
                 </button>
               </div>
             </div>
@@ -320,7 +320,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       )}
 
       {/* Unified Feed Layout */}
-      <div id="feed-grid" className={`grid gap-8 ${
+      <div id="feed-grid" className={`grid gap-4 sm:gap-6 md:gap-8 ${
         viewMode === 'grid' 
           ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
           : 'grid-cols-1 max-w-4xl mx-auto'
