@@ -12,20 +12,6 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
   const generateBrief = useCallback(async (force = false) => {
     if (loading || items.length === 0) return;
 
-    // Check cache first if not forcing
-    if (!force) {
-      const cached = localStorage.getItem('weekly_brief_cache');
-      if (cached) {
-        const { content, timestamp } = JSON.parse(cached);
-        const age = Date.now() - timestamp;
-        if (age < 6 * 60 * 60 * 1000) { // 6 hours
-          setBrief(content);
-          setLastUpdated(new Date(timestamp));
-          return;
-        }
-      }
-    }
-
     setLoading(true);
     setError(null);
 
@@ -149,12 +135,6 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         setBrief(text);
         const now = new Date();
         setLastUpdated(now);
-        
-        // Cache the result
-        localStorage.setItem('weekly_brief_cache', JSON.stringify({
-          content: text,
-          timestamp: now.getTime()
-        }));
       } else {
         throw new Error("No content generated");
       }
@@ -168,23 +148,9 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
     }
   }, [items, loading]);
 
-  // Load from cache on mount
+  // Removed cache loading on mount
   useEffect(() => {
-    const cached = localStorage.getItem('weekly_brief_cache');
-    if (cached) {
-      try {
-        const { content, timestamp } = JSON.parse(cached);
-        const age = Date.now() - timestamp;
-        // Check if cache is valid (less than 6 hours old)
-        if (age < 6 * 60 * 60 * 1000) {
-          setBrief(content);
-          setLastUpdated(new Date(timestamp));
-        }
-      } catch (e) {
-        console.error("Failed to parse cached brief", e);
-        localStorage.removeItem('weekly_brief_cache');
-      }
-    }
+    // Intentionally left blank as cache is disabled
   }, []);
 
   return {
