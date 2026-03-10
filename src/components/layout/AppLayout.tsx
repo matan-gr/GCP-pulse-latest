@@ -106,7 +106,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <div className={`flex-1 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'lg:ml-72' : ''}`}>
         
         {/* Top Header / Controls */}
-        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-xl border-b border-[#dadce0] dark:border-[#3c4043] h-16 flex items-center">
+        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-xl border-b border-[#dadce0] dark:border-[#3c4043] h-14 flex items-center">
           <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 flex items-center justify-between gap-4">
             
             {/* Left: Menu & Title */}
@@ -114,28 +114,28 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               {/* Mobile Menu Trigger */}
               <button 
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden p-2 -ml-2 text-[#5f6368] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
+                className="lg:hidden p-1.5 -ml-2 text-[#5f6368] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
               >
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
 
               {/* Desktop Sidebar Toggle */}
               {!isPresentationMode && (
                 <button
                   onClick={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-                  className="hidden lg:flex p-2 -ml-2 text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
+                  className="hidden lg:flex p-1.5 -ml-2 text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
                   title={isDesktopSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
                 >
-                  {isDesktopSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+                  {isDesktopSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
                 </button>
               )}
 
               {isPresentationMode && (
                 <div className="flex items-center space-x-2 mr-4 group cursor-pointer">
-                  <div className="w-8 h-8 bg-[#1a73e8] rounded-full flex items-center justify-center">
-                    <Zap size={16} className="text-white" />
+                  <div className="w-7 h-7 bg-[#1a73e8] rounded-full flex items-center justify-center">
+                    <Zap size={14} className="text-white" />
                   </div>
-                  <span className="text-lg font-medium text-[#202124] dark:text-[#e8eaed] tracking-tight">GCP Pulse</span>
+                  <span className="text-md font-medium text-[#202124] dark:text-[#e8eaed] tracking-tight">GCP Pulse</span>
                 </div>
               )}
               
@@ -146,7 +146,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </div>
 
             {/* Center: Global Search */}
-            <div className="flex-1 max-w-2xl mx-4 hidden md:block">
+            <div className="flex-1 max-w-xl mx-4 hidden md:block">
                {!isPresentationMode && activeTab !== 'tools' && (
                   <GlobalSearch 
                     value={search} 
@@ -177,22 +177,22 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                <Tooltip content="Contact Author" position="bottom">
                  <a 
                    href="mailto:matangr@google.com"
-                   className="hidden sm:flex items-center gap-2 px-4 py-2 text-[12px] font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all border border-[#dadce0] dark:border-[#5f6368]"
+                   className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all border border-[#dadce0] dark:border-[#5f6368]"
                  >
-                   <MessageSquarePlus size={16} />
+                   <MessageSquarePlus size={14} />
                    <span>matangr</span>
                  </a>
                </Tooltip>
 
-               <div className="w-px h-5 bg-[#dadce0] dark:bg-[#5f6368] mx-1 hidden sm:block" />
+               <div className="w-px h-4 bg-[#dadce0] dark:bg-[#5f6368] mx-1 hidden sm:block" />
 
                {/* Theme Toggle */}
                <Tooltip content={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`} position="bottom">
                  <button
                   onClick={toggleTheme}
-                  className="p-2 rounded-full text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-all border border-[#dadce0] dark:border-[#5f6368] bg-white dark:bg-[#292a2d]"
+                  className="p-1.5 rounded-full text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-all border border-[#dadce0] dark:border-[#5f6368] bg-white dark:bg-[#292a2d]"
                 >
-                  {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                  {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
                 </button>
                </Tooltip>
             </div>
@@ -200,7 +200,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </header>
 
         {/* Mobile Search (visible only on small screens) */}
-        <div className="md:hidden px-4 py-3 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl">
+        <div className="md:hidden px-4 py-2 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl">
            {!isPresentationMode && activeTab !== 'tools' && (
               <GlobalSearch 
                 value={search} 
@@ -225,7 +225,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
            )}
         </div>
 
-        <div className="p-3 sm:p-4 md:p-6 pb-24 max-w-[1600px] mx-auto min-h-[calc(100vh-200px)]">
+        <div className="p-2 sm:p-3 md:p-4 pb-20 max-w-[1600px] mx-auto min-h-[calc(100vh-160px)]">
           {isAnyFilterActive && onClearFilters && (
             <div className="mb-6 flex items-center justify-between p-4 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 border border-[#d2e3fc] dark:border-[#8ab4f8]/30 rounded-[24px] animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center gap-3">

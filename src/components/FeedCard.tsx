@@ -232,24 +232,24 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
             </div>
           )}
 
-          <h3 className={`font-semibold text-[#202124] dark:text-[#e8eaed] mb-2 z-10 relative ${isPresentationMode ? 'text-lg' : isCompact ? 'text-[15px]' : 'text-[17px]'} leading-snug`}>
+          <h3 className={`font-semibold text-[#202124] dark:text-[#e8eaed] mb-1.5 z-10 relative ${isPresentationMode ? 'text-md' : isCompact ? 'text-[14px]' : 'text-[15px]'} leading-snug`}>
             <a href={item.link} target="_blank" rel="noopener noreferrer" className={`hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] transition-colors`}>
               {item.title}
             </a>
           </h3>
 
-          <p className={`text-[#5f6368] dark:text-[#9aa0a6] text-[14px] mb-5 z-10 relative flex-1 leading-relaxed ${isPresentationMode ? 'line-clamp-4' : 'line-clamp-3'}`}>
+          <p className={`text-[#5f6368] dark:text-[#9aa0a6] text-[13px] mb-4 z-10 relative flex-1 leading-relaxed ${isPresentationMode ? 'line-clamp-4' : 'line-clamp-3'}`}>
             {item.contentSnippet}
           </p>
 
-          <div className="mt-auto z-10 flex items-center justify-between relative pt-4 border-t border-[#dadce0] dark:border-[#3c4043]">
+          <div className="mt-auto z-10 flex items-center justify-between relative pt-3 border-t border-[#dadce0] dark:border-[#3c4043]">
             <a 
                 href={item.link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className={`inline-flex items-center text-[11px] font-bold uppercase tracking-wider hover:underline transition-colors ${iconColor}`}
+                className={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider hover:underline transition-colors ${iconColor}`}
             >
-                View Incident <ArrowRight size={12} className="ml-1.5" />
+                View Incident <ArrowRight size={10} className="ml-1" />
             </a>
             
             {!isPresentationMode && (
@@ -260,10 +260,10 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                       onSummarize(item);
                     }}
                     disabled={isSummarizing}
-                    className={`p-2 rounded-full hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-colors ${iconColor}`}
+                    className={`p-1.5 rounded-full hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-colors ${iconColor}`}
                     title="Summarize Incident"
                 >
-                  {isSummarizing ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  {isSummarizing ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                 </button>
               </div>
             )}
@@ -280,16 +280,16 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
         className={cn(
-          "flex group relative rounded-3xl overflow-hidden transition-all duration-300 bg-white dark:bg-[#202124] border border-[#dadce0] dark:border-[#3c4043] shadow-sm hover:shadow-xl hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30",
-          isListView ? "flex-row min-h-[160px]" : "flex-col h-full",
+          "flex group relative rounded-2xl overflow-hidden transition-all duration-300 bg-white dark:bg-[#202124] border border-[#dadce0] dark:border-[#3c4043] shadow-sm hover:shadow-lg hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30",
+          isListView ? "flex-row min-h-[140px]" : "flex-col h-full",
           isSaved && "ring-2 ring-[#1a73e8] ring-offset-2 dark:ring-offset-[#202124]",
         )}
       >
         {/* Deprecation Warning Banner */}
         {isDeprecation && daysUntilEOL > 0 && (
-          <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider flex items-center justify-between border-b ${urgencyColor}`}>
+          <div className={`px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider flex items-center justify-between border-b ${urgencyColor}`}>
             <span className="flex items-center">
-              <AlertOctagon size={12} className="mr-2" />
+              <AlertOctagon size={10} className="mr-1.5" />
               Deprecation Notice
             </span>
             <span>{daysUntilEOL} Days Left</span>
@@ -299,7 +299,7 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
         {/* Image Section */}
         {image && !isPresentationMode && showImages && (
           <div 
-            className={`${isListView ? 'w-64 min-w-[256px]' : isCompact ? 'h-40' : 'h-52'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
+            className={`${isListView ? 'w-56 min-w-[224px]' : isCompact ? 'h-32' : 'h-40'} overflow-hidden relative cursor-pointer group/image bg-[#f8f9fa] dark:bg-[#303134] border-b border-[#dadce0] dark:border-[#3c4043]`}
             onClick={(e) => {
               e.stopPropagation();
               onSummarize(item);
@@ -316,15 +316,15 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
               
               {item.videoId && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-lg group-hover/image:scale-110 transition-transform duration-300">
-                    <Play size={20} className="text-white ml-1 fill-white" />
+                  <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-lg group-hover/image:scale-110 transition-transform duration-300">
+                    <Play size={16} className="text-white ml-0.5 fill-white" />
                   </div>
                 </div>
               )}
   
               {item.duration && (
-                <div className="absolute bottom-3 right-3 z-20">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black/70 text-white backdrop-blur-md">
+                <div className="absolute bottom-2 right-2 z-20">
+                  <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-black/70 text-white backdrop-blur-md">
                     {item.duration}
                   </span>
                 </div>
@@ -332,62 +332,62 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
           </div>
         )}
         
-          <div className={`${isCompact ? 'p-4' : 'p-4 sm:p-5 md:p-6'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
+          <div className={`${isCompact ? 'p-3' : 'p-3 sm:p-4'} flex-1 flex flex-col ${isListView ? 'justify-between' : ''}`}>
           <div className="w-full">
-            <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-2' : 'mb-3'}`}>
-               <div className="flex items-center space-x-2">
+            <div className={`flex items-center justify-between w-full ${isCompact ? 'mb-1.5' : 'mb-2'}`}>
+               <div className="flex items-center space-x-1.5">
                   {isNew && !isPresentationMode && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-800 uppercase tracking-widest">
-                      <Sparkles size={9} />
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0 rounded text-[8px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-800 uppercase tracking-widest">
+                      <Sparkles size={8} />
                       NEW
                     </span>
                   )}
                   <span className={cn(
-                    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border transition-all duration-300",
+                    "inline-flex items-center gap-1 px-2 py-0 rounded text-[8px] font-bold uppercase tracking-widest border transition-all duration-300",
                     getSourceStyles(item.source)
                   )}>
-                    <SourceIcon source={item.source} size={10} />
+                    <SourceIcon source={item.source} size={8} />
                     {item.source}
                   </span>
                   {isTrending && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 border border-orange-100 dark:border-orange-800 uppercase tracking-widest">
-                      <TrendingUp size={9} />
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0 rounded text-[8px] font-bold bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 border border-orange-100 dark:border-orange-800 uppercase tracking-widest">
+                      <TrendingUp size={8} />
                       TRENDING
                     </span>
                   )}
                </div>
-               <span className="text-[9px] text-[#5f6368] dark:text-[#9aa0a6] font-bold uppercase tracking-[0.2em] tabular-nums">
+               <span className="text-[8px] text-[#5f6368] dark:text-[#9aa0a6] font-bold uppercase tracking-[0.2em] tabular-nums">
                   {date}
                </span>
             </div>
             
-            <h3 className={`font-heading font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-2 text-[15px]' : 'mb-2 text-[16px] sm:text-[18px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
+            <h3 className={`font-heading font-semibold text-[#202124] dark:text-[#e8eaed] ${isCompact ? 'mb-1.5 text-[14px]' : 'mb-1.5 text-[15px] sm:text-[16px]'} group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors leading-snug tracking-tight`}>
                 <a href={item.link} target="_blank" rel="noopener noreferrer" className="focus:outline-none">
                     {item.title}
                 </a>
             </h3>
 
           {item.channelName && (
-            <div className="mb-2 flex items-center text-[11px] text-[#5f6368] dark:text-[#9aa0a6]">
-              <Youtube size={12} className="mr-1.5 text-[#ea4335]" />
+            <div className="mb-1.5 flex items-center text-[10px] text-[#5f6368] dark:text-[#9aa0a6]">
+              <Youtube size={10} className="mr-1 text-[#ea4335]" />
               <span className="font-medium">{item.channelName}</span>
             </div>
           )}
 
           {/* Product Labels for Release Notes */}
           {(item.source === 'Release Notes' || item.source === 'Gemini Enterprise') && displayLabels.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-1.5">
+            <div className="mb-1.5 flex flex-wrap gap-1">
               {displayLabels.slice(0, 3).map((label) => (
-                <span key={label} className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black bg-[#f1f3f4] text-[#5f6368] dark:bg-[#3c4043] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368] uppercase tracking-widest transition-all hover:bg-[#e8f0fe] hover:text-[#1a73e8] hover:border-[#d2e3fc]">
-                  <Tag size={9} className="mr-1.5 opacity-70" />
+                <span key={label} className="inline-flex items-center px-1.5 py-0 rounded text-[8px] font-black bg-[#f1f3f4] text-[#5f6368] dark:bg-[#3c4043] dark:text-[#9aa0a6] border border-[#dadce0] dark:border-[#5f6368] uppercase tracking-widest transition-all hover:bg-[#e8f0fe] hover:text-[#1a73e8] hover:border-[#d2e3fc]">
+                  <Tag size={8} className="mr-1 opacity-70" />
                   {label}
                 </span>
               ))}
             </div>
           )}
           
-          <div className={`relative ${isCompact ? 'mb-2' : 'mb-2'}`}>
-            <div className={`text-[#5f6368] dark:text-[#9aa0a6] ${isCompact ? 'text-[12px] leading-relaxed line-clamp-2' : 'text-[13px] sm:text-[14px] leading-relaxed'} ${!isExpanded && !isCompact && !isPresentationMode ? 'line-clamp-2 sm:line-clamp-3' : ''} prose dark:prose-invert max-w-none prose-p:my-0`}>
+          <div className={`relative ${isCompact ? 'mb-1.5' : 'mb-1.5'}`}>
+            <div className={`text-[#5f6368] dark:text-[#9aa0a6] ${isCompact ? 'text-[11px] leading-relaxed line-clamp-2' : 'text-[12px] sm:text-[13px] leading-relaxed'} ${!isExpanded && !isCompact && !isPresentationMode ? 'line-clamp-2 sm:line-clamp-3' : ''} prose dark:prose-invert max-w-none prose-p:my-0`}>
                 <ReactMarkdown 
                   components={markdownComponents}
                 >
@@ -401,12 +401,12 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                   e.preventDefault();
                   setIsExpanded(!isExpanded);
                 }}
-                className="text-[9px] font-bold text-[#5f6368] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] mt-1 flex items-center focus:outline-none uppercase tracking-widest transition-colors"
+                className="text-[8px] font-bold text-[#5f6368] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] mt-0.5 flex items-center focus:outline-none uppercase tracking-widest transition-colors"
               >
                 {isExpanded ? (
-                  <>Less <ChevronUp size={10} className="ml-0.5" /></>
+                  <>Less <ChevronUp size={8} className="ml-0.5" /></>
                 ) : (
-                  <>More <ChevronDown size={10} className="ml-0.5" /></>
+                  <>More <ChevronDown size={8} className="ml-0.5" /></>
                 )}
               </button>
             )}
@@ -414,7 +414,7 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
 
           {/* Categories */}
           {!isPresentationMode && !isCompact && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-wrap gap-1.5">
               {displayLabels.slice(0, 3).map((cat) => {
                 const isSubscribed = subscribedCategories.includes(cat);
                 return (
@@ -426,13 +426,13 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                       else onToggleSubscription(cat);
                     }}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 border shadow-sm hover:scale-105 active:scale-95",
+                      "px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all duration-300 border shadow-sm hover:scale-105 active:scale-95",
                       isSubscribed 
                         ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-blue-200'
                         : getCategoryStyles(cat)
                     )}
                   >
-                      <span className="truncate max-w-[120px]">{cat}</span>
+                      <span className="truncate max-w-[100px]">{cat}</span>
                   </button>
                 );
               })}
@@ -440,38 +440,38 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
           )}
 
           {analysis && (
-            <div className={`mb-4 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 rounded-2xl border border-[#d2e3fc] dark:border-[#8ab4f8]/20 ${isCompact ? 'p-3' : 'p-4'} relative overflow-hidden group/ai`}>
-              <div className="flex items-center text-[10px] font-bold text-[#1a73e8] dark:text-[#8ab4f8] uppercase tracking-widest mb-2">
-                <Sparkles size={12} className="mr-1.5" />
+            <div className={`mb-3 bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 rounded-xl border border-[#d2e3fc] dark:border-[#8ab4f8]/20 ${isCompact ? 'p-2' : 'p-3'} relative overflow-hidden group/ai`}>
+              <div className="flex items-center text-[9px] font-bold text-[#1a73e8] dark:text-[#8ab4f8] uppercase tracking-widest mb-1">
+                <Sparkles size={10} className="mr-1" />
                 AI Insight
               </div>
-              <p className={`text-[#202124] dark:text-[#e8eaed] leading-relaxed relative z-10 ${isCompact ? 'text-[12px] line-clamp-2' : 'text-[13px] line-clamp-3'}`}>
+              <p className={`text-[#202124] dark:text-[#e8eaed] leading-relaxed relative z-10 ${isCompact ? 'text-[11px] line-clamp-2' : 'text-[12px] line-clamp-3'}`}>
                 {analysis.impact}
               </p>
             </div>
           )}
         </div>
         
-        <div className={`mt-auto ${!isListView ? `pt-3 border-t border-[#dadce0] dark:border-[#3c4043] ${isCompact ? 'pt-2' : 'pt-3'}` : ''}`}>
+        <div className={`mt-auto ${!isListView ? `pt-2 border-t border-[#dadce0] dark:border-[#3c4043] ${isCompact ? 'pt-1.5' : 'pt-2'}` : ''}`}>
             <div className="flex items-center justify-between w-full">
                 <a 
                     href={item.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-[11px] font-bold uppercase tracking-widest text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] transition-colors group/link"
+                    className="inline-flex items-center text-[10px] font-bold uppercase tracking-widest text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] transition-colors group/link"
                 >
-                    Read <ArrowRight size={12} className="ml-1.5 opacity-50 group-hover/link:opacity-100 transition-opacity" />
+                    Read <ArrowRight size={10} className="ml-1 opacity-50 group-hover/link:opacity-100 transition-opacity" />
                 </a>
 
                 {!isPresentationMode && (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-0.5">
                   <Tooltip content="Copy Link" position="top">
                     <button
                       onClick={handleCopyLink}
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded-full text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] transition-colors"
                       aria-label="Copy Link"
                     >
-                      <LinkIcon size={14} />
+                      <LinkIcon size={12} />
                     </button>
                   </Tooltip>
 
@@ -481,10 +481,10 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                         e.stopPropagation();
                         onSave(item);
                       }}
-                      className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${isSaved ? 'text-[#1a73e8] dark:text-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#8ab4f8]/20' : 'text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043]'}`}
+                      className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors ${isSaved ? 'text-[#1a73e8] dark:text-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#8ab4f8]/20' : 'text-[#5f6368] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043]'}`}
                       aria-label={isSaved ? "Remove from Read Later" : "Read Later"}
                     >
-                      <Bookmark size={14} className={isSaved ? "fill-current" : ""} />
+                      <Bookmark size={12} className={isSaved ? "fill-current" : ""} />
                     </button>
                   </Tooltip>
 
@@ -495,10 +495,10 @@ const FeedCardContent: React.FC<FeedCardProps> = ({
                         onSummarize(item);
                       }}
                       disabled={isSummarizing}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#202124] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] transition-colors text-[10px] font-black disabled:opacity-50 border border-transparent ml-2 uppercase tracking-widest"
+                      className="inline-flex items-center px-2 py-1 rounded-lg bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#202124] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] transition-colors text-[9px] font-black disabled:opacity-50 border border-transparent ml-1.5 uppercase tracking-widest"
                       aria-label="Generate AI Summary"
                   >
-                      {isSummarizing ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} className="mr-1.5" />}
+                      {isSummarizing ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} className="mr-1" />}
                       {isSummarizing ? '' : 'Summarize'}
                   </button>
                 </Tooltip>

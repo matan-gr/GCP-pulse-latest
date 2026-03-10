@@ -30,7 +30,7 @@
 
 body {
   font-family: var(--font-sans);
-  @apply antialiased text-[#202124] dark:text-[#e8eaed] bg-[var(--color-bg-app)] dark:bg-[var(--color-bg-app-dark)];
+  @apply antialiased text-sm text-[#202124] dark:text-[#e8eaed] bg-[var(--color-bg-app)] dark:bg-[var(--color-bg-app-dark)];
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Component Classes */
 @layer components {
   .glass-card {
-    @apply bg-white dark:bg-[#292a2d] rounded-xl transition-all duration-300 border border-[#dadce0] dark:border-[#3c4043];
+    @apply bg-white dark:bg-[#292a2d] rounded-lg transition-all duration-300 border border-[#dadce0] dark:border-[#3c4043];
     box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
   }
   
@@ -51,7 +51,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .sidebar-link {
-    @apply w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] hover:text-[#202124] dark:hover:text-[#e8eaed] font-medium text-sm;
+    @apply w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] hover:text-[#202124] dark:hover:text-[#e8eaed] font-medium text-xs;
   }
 
   .sidebar-link-active {
@@ -59,6 +59,6 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .category-badge {
-    @apply px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wider transition-all duration-200 border border-[#dadce0] dark:border-[#5f6368] text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#3c4043];
+    @apply px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider transition-all duration-200 border border-[#dadce0] dark:border-[#5f6368] text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#3c4043];
   }
 }
