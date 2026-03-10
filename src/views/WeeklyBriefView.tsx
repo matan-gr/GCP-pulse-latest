@@ -305,13 +305,14 @@ export const WeeklyBriefView: React.FC<WeeklyBriefViewProps> = ({ items }) => {
                Generate Brief
              </button>
           </div>
-        ) : loading && !brief ? (
+        ) : loading ? (
           <div className="absolute inset-0 z-10 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-sm flex items-center justify-center">
             <AILoading 
               variant="card" 
               title="Generating Weekly Brief" 
               subtitle="Analyzing the latest updates, security bulletins, and architecture changes from the last 7 days..." 
               icon={Sparkles}
+              model="gemini-3-flash-preview"
             />
           </div>
         ) : error ? (

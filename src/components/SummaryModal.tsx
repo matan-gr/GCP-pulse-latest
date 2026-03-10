@@ -14,9 +14,10 @@ interface SummaryModalProps {
   analysis: AnalysisResult | null;
   streamContent?: string;
   isStreaming?: boolean;
+  model?: string;
 }
 
-export const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, title, analysis, streamContent, isStreaming }) => {
+export const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, title, analysis, streamContent, isStreaming, model }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -192,8 +193,9 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, tit
                         <AILoading 
                           variant="inline" 
                           title="Initializing AI Analysis..." 
-                          subtitle="Connecting to Gemini 2.5 Flash" 
+                          subtitle="Connecting to Gemini 3 Flash" 
                           icon={Sparkles}
+                          model={model}
                         />
                     ) : (
                         <div className="text-center">

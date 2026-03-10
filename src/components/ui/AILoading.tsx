@@ -7,13 +7,15 @@ interface AILoadingProps {
   subtitle?: string;
   variant?: 'inline' | 'fullscreen' | 'card' | 'minimal';
   icon?: React.ElementType;
+  model?: string;
 }
 
 export const AILoading: React.FC<AILoadingProps> = ({ 
   title = "AI Analysis in Progress", 
   subtitle = "Gemini is analyzing content...", 
   variant = 'card',
-  icon: Icon = Sparkles
+  icon: Icon = Sparkles,
+  model
 }) => {
   
   if (variant === 'minimal') {
@@ -195,6 +197,11 @@ export const AILoading: React.FC<AILoadingProps> = ({
       <p className="text-[14px] text-[#5f6368] dark:text-[#9aa0a6] text-center max-w-xs font-medium opacity-80">
         {subtitle}
       </p>
+      {model && (
+        <div className="mt-4 px-3 py-1 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full text-[10px] font-bold uppercase tracking-widest border border-[#d2e3fc] dark:border-[#8ab4f8]/30">
+          Model: {model}
+        </div>
+      )}
       
       <div className="mt-8 flex items-end space-x-1.5 h-10">
         {[0, 1, 2, 3, 4, 5, 6].map((i) => (

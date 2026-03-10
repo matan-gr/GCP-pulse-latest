@@ -20,7 +20,7 @@ export const useFeed = () => {
   return useQuery({
     queryKey: ['feed'],
     queryFn: fetchFeed,
-    staleTime: 1000 * 60 * 60, // 60 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
@@ -29,7 +29,7 @@ export const useProductDeprecations = () => {
   return useQuery({
     queryKey: ['feed'], // Share cache with useFeed
     queryFn: fetchFeed,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => {
         // We are looking for items from "Release Notes" that are about deprecations.
@@ -92,7 +92,7 @@ export const useSecurityBulletins = () => {
   return useQuery({
     queryKey: ['feed'], // Share cache with useFeed
     queryFn: fetchFeed,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Security Bulletins').map(item => {
         // Robust Severity Extraction
@@ -128,7 +128,7 @@ export const useArchitectureUpdates = () => {
   return useQuery({
     queryKey: ['feed'], // Share cache with useFeed
     queryFn: fetchFeed,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Architecture Center').map(item => {
         let title = item.title;
@@ -213,7 +213,7 @@ export const useYouTubeFeed = () => {
   return useQuery({
     queryKey: ['feed'], // Share cache with useFeed
     queryFn: fetchFeed,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Google Cloud YouTube');
     }

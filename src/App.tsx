@@ -507,6 +507,7 @@ function AppContent() {
           analysis={summaryModal.analysis}
           streamContent={summaryModal.streamContent}
           isStreaming={summaryModal.isStreaming}
+          model="gemini-3-flash-preview"
         />
       )}
     </AppLayout>

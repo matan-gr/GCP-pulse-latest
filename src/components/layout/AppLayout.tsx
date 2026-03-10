@@ -116,7 +116,7 @@ export const AppLayout = React.memo<AppLayoutProps>(({
       <div className={`flex-1 transition-all duration-300 min-w-0 ${!isPresentationMode && isDesktopSidebarOpen ? 'lg:ml-72' : ''}`}>
         
         {/* Top Header / Controls */}
-        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-xl border-b border-[#dadce0] dark:border-[#3c4043] h-14 flex items-center">
+        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#0f0f0f]/80 backdrop-blur-xl border-b border-[#dadce0] dark:border-[#3c4043] h-14 flex items-center">
           <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
             
             {/* Left: Menu & Title */}
@@ -210,7 +210,7 @@ export const AppLayout = React.memo<AppLayoutProps>(({
         </header>
 
         {/* Mobile Search (visible only on small screens) */}
-        <div className="md:hidden px-3 py-2 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl">
+        <div className="md:hidden px-3 py-2 border-b border-[#dadce0] dark:border-[#3c4043] bg-white/90 dark:bg-[#0f0f0f]/90 backdrop-blur-xl">
            {!isPresentationMode && activeTab !== 'tools' && (
               <GlobalSearch 
                 value={search} 
@@ -260,7 +260,7 @@ export const AppLayout = React.memo<AppLayoutProps>(({
         </div>
 
         {/* Minimal Footer */}
-        <footer className={`fixed bottom-0 right-0 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-xl border-t border-[#dadce0] dark:border-[#3c4043] py-2 px-4 sm:px-6 z-40 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'left-72' : 'left-0'}`}>
+        <footer className={`fixed bottom-0 right-0 bg-white/90 dark:bg-[#0f0f0f]/90 backdrop-blur-xl border-t border-[#dadce0] dark:border-[#3c4043] py-2 px-4 sm:px-6 z-40 transition-all duration-300 ${!isPresentationMode && isDesktopSidebarOpen ? 'lg:left-72 left-0' : 'left-0'}`}>
           <div className="max-w-[1600px] mx-auto flex justify-between items-center text-[9px] sm:text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6]">
             <div className="flex items-center gap-3 sm:gap-4 uppercase tracking-widest">
               <CurrentTime />
