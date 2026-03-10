@@ -109,6 +109,14 @@ export const useWeeklyBrief = (items: FeedItem[]) => {
         ## ⚠️ Critical Deprecations & Breaking Changes (High Priority)
         **MANDATORY:** You MUST present this section as a Markdown table. Do not use a list format for the summary.
         
+        You MUST format the table with newlines between each row. It should look exactly like this:
+        | Header 1 | Header 2 |
+        | --- | --- |
+        | Row 1 | Data 1 |
+        | Row 2 | Data 2 |
+        
+        Do not put the entire table on one line.
+        
         | Product Name | Description | Action Required By | Priority |
         | :--- | :--- | :--- | :--- |
         | [Name] | [Brief description] | [Date] | [High/Med] |

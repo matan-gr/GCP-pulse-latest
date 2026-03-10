@@ -2,6 +2,7 @@ import React from 'react';
 import { FeedItem } from '../types';
 import { Sparkles, RefreshCw, Calendar, FileText, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { motion } from 'motion/react';
 import { useWeeklyBrief } from '../hooks/useWeeklyBrief';
 import { toast } from 'sonner';
@@ -205,6 +206,23 @@ export const WeeklyBriefView: React.FC<WeeklyBriefViewProps> = ({ items }) => {
     li: ({...props}: any) => (
       <li className="leading-relaxed pl-1">{props.children}</li>
     ),
+    table: ({...props}: any) => (
+      <div className="overflow-x-auto my-6 rounded-xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm">
+        <table className="w-full text-left border-collapse" {...props} />
+      </div>
+    ),
+    thead: ({...props}: any) => (
+      <thead className="bg-[#f8f9fa] dark:bg-[#303134]" {...props} />
+    ),
+    th: ({...props}: any) => (
+      <th className="px-4 py-3 text-[10px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-widest border-b border-[#dadce0] dark:border-[#3c4043]" {...props} />
+    ),
+    td: ({...props}: any) => (
+      <td className="px-4 py-3 text-[13px] text-[#3c4043] dark:text-[#bdc1c6] border-b border-[#dadce0] dark:border-[#3c4043] align-top" {...props} />
+    ),
+    tr: ({...props}: any) => (
+      <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" {...props} />
+    ),
     blockquote: ({...props}: any) => (
       <blockquote className="pl-4 border-l-4 border-[#1a73e8] bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 py-3 pr-4 rounded-r-xl my-6 text-[#3c4043] dark:text-[#bdc1c6] italic" {...props} />
     ),
@@ -213,6 +231,15 @@ export const WeeklyBriefView: React.FC<WeeklyBriefViewProps> = ({ items }) => {
     ),
     a: ({...props}: any) => (
       <a className="text-[#1a73e8] dark:text-[#8ab4f8] hover:underline font-medium break-all transition-colors" target="_blank" rel="noopener noreferrer" {...props} />
+    ),
+    hr: ({...props}: any) => (
+      <hr className="my-8 border-[#dadce0] dark:border-[#3c4043]" {...props} />
+    ),
+    code: ({...props}: any) => (
+      <code className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-sm font-mono text-[#1a73e8] dark:text-[#8ab4f8]" {...props} />
+    ),
+    pre: ({...props}: any) => (
+      <pre className="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-x-auto my-6 font-mono text-sm border border-[#dadce0] dark:border-[#3c4043]" {...props} />
     ),
   };
 
@@ -309,7 +336,7 @@ export const WeeklyBriefView: React.FC<WeeklyBriefViewProps> = ({ items }) => {
             className="p-8 md:p-12 max-w-4xl mx-auto"
           >
             <article className="prose prose-slate dark:prose-invert max-w-none">
-              <ReactMarkdown components={MarkdownComponents}>
+              <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
                 {brief || ''}
               </ReactMarkdown>
             </article>
