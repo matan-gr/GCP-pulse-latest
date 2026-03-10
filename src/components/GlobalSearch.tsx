@@ -96,6 +96,17 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         
         {/* Right Actions */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1 z-20">
+          {/* Clear Search Button */}
+          {value && (
+            <button
+              onClick={() => onChange('')}
+              className="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-all"
+              title="Clear search"
+            >
+              <X size={16} />
+            </button>
+          )}
+
           {/* Smart Filter Toggle */}
           <Tooltip content="Toggle AI Smart Search" position="bottom">
             <button
@@ -158,9 +169,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
             {onClearFilters && (
               <button 
                 onClick={onClearFilters}
-                className="text-[10px] font-bold text-[#5f6368] hover:text-[#202124] dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] uppercase tracking-widest ml-auto"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#292a2d] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#202124] dark:hover:text-[#e8eaed] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] border border-[#dadce0] dark:border-[#5f6368] rounded-full text-[10px] font-bold uppercase tracking-widest ml-auto transition-all shadow-sm active:scale-95"
               >
-                Clear All
+                <X size={12} />
+                Clear All Filters
               </button>
             )}
           </motion.div>

@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'motion/react';
 const IPRangeFinder = React.lazy(() => import('../components/IPRangeFinder').then(module => ({ default: module.IPRangeFinder })));
 const GKEVersionTracker = React.lazy(() => import('../components/GKEVersionTracker').then(module => ({ default: module.GKEVersionTracker })));
 const GKESkewValidator = React.lazy(() => import('../components/tools/GKESkewValidator').then(module => ({ default: module.GKESkewValidator })));
+const SystemSettings = React.lazy(() => import('../components/tools/SystemSettings').then(module => ({ default: module.SystemSettings })));
 
-type ToolId = 'ip-ranges' | 'gke-tracker' | 'gke-skew';
+type ToolId = 'ip-ranges' | 'gke-tracker' | 'gke-skew' | 'system-settings';
 
 interface ToolDef {
   id: ToolId;
@@ -42,6 +43,14 @@ const TOOLS: ToolDef[] = [
     icon: GitMerge,
     color: 'text-emerald-600 dark:text-emerald-400',
     bgColor: 'bg-emerald-50 dark:bg-emerald-900/20'
+  },
+  {
+    id: 'system-settings',
+    title: 'System Settings',
+    description: 'Manage application cache and system preferences.',
+    icon: Server,
+    color: 'text-slate-600 dark:text-slate-400',
+    bgColor: 'bg-slate-100 dark:bg-slate-800'
   }
 ];
 
@@ -140,6 +149,7 @@ export const ToolsView: React.FC = () => {
                 {activeTool === 'ip-ranges' && <IPRangeFinder />}
                 {activeTool === 'gke-tracker' && <GKEVersionTracker />}
                 {activeTool === 'gke-skew' && <GKESkewValidator />}
+                {activeTool === 'system-settings' && <SystemSettings />}
               </Suspense>
             </motion.div>
           </AnimatePresence>
