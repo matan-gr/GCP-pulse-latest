@@ -10,6 +10,16 @@ export function getAiInstance() {
     // Defensive check for common issues
     if (typeof apiKey === 'string') {
       apiKey = apiKey.trim();
+      
+      // Remove surrounding quotes if any
+      apiKey = apiKey.replace(/^["']|["']$/g, '');
+      
+      // Fix common copy-paste errors (e.g. leading 'y' as seen in some deployment commands)
+      if (apiKey.startsWith('yAIza')) {
+        console.warn('Detected potentially invalid leading "y" in Gemini API key. Stripping it.');
+        apiKey = apiKey.substring(1);
+      }
+
       // Handle common placeholder or accidental stringified values
       if (apiKey === 'undefined' || apiKey === 'null' || apiKey === '' || apiKey.includes('YOUR_API_KEY')) {
         apiKey = undefined;

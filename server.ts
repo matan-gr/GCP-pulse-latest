@@ -130,7 +130,7 @@ const enrichYouTubeItems = async (items: any[]) => {
   if (videoIds.length === 0) return items;
 
   try {
-    const apiKey = process.env.YOUTUBE_API_KEY;
+    const apiKey = (process.env.YOUTUBE_API_KEY || '').trim().replace(/^["']|["']$/g, '');
     if (!apiKey) throw new Error('YOUTUBE_API_KEY is missing');
 
     // Fetch details in batches of 50
@@ -440,7 +440,7 @@ if (!isProduction) {
         return;
       }
       
-      const apiKey = process.env.GEMINI_API_KEY || '';
+      const apiKey = (process.env.GEMINI_API_KEY || '').trim().replace(/^["']|["']$/g, '');
       const envScript = `<script>window.__GEMINI_API_KEY__ = ${JSON.stringify(apiKey)}; window.process = window.process || { env: {} }; window.process.env.GEMINI_API_KEY = ${JSON.stringify(apiKey)};</script>`;
       const injectedHtml = htmlData.replace('<head>', `<head>${envScript}`);
       
