@@ -24,18 +24,22 @@ app.set('trust proxy', 1);
 // REMOVED: AI endpoints have been moved to the frontend to comply with security guidelines.
 
 const FEEDS = [
-  { url: "https://cloudblog.withgoogle.com/rss/", name: "Cloud Blog" },
+  { url: "https://cloud.google.com/blog/rss", name: "Cloud Blog" },
   { url: "https://blog.google/products/google-cloud/rss/", name: "Product Updates" },
   { url: "https://cloud.google.com/feeds/gcp-release-notes.xml", name: "Release Notes" },
   { url: "https://docs.cloud.google.com/feeds/google-cloud-security-bulletins.xml", name: "Security Bulletins" },
   { url: "https://cloud.google.com/feeds/architecture-center-release-notes.xml", name: "Architecture Center" },
-  { url: "http://googleaiblog.blogspot.com/atom.xml", name: "Google AI Research" },
+  { url: "https://blog.google/technology/ai/rss/", name: "Google AI Research" },
   { url: "https://docs.cloud.google.com/feeds/gemini-enterprise-release-notes.xml", name: "Gemini Enterprise" },
-  { url: "https://corsproxy.io/?https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
+  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
 ];
 
 const parser = new Parser({
-  timeout: 5000, // 5 seconds timeout for RSS feeds
+  timeout: 10000, // Increased to 10 seconds
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'application/rss+xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8'
+  },
   customFields: {
     item: [
       ['media:group', 'mediaGroup'],
@@ -241,8 +245,10 @@ const fetchFeeds = async () => {
         isoDate: item.isoDate || (item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString())
       }));
       
-      feedCacheMap.set(feedSource.url, items);
-      return items;
+      if (items.length > 0) {
+        feedCacheMap.set(feedSource.url, items);
+      }
+      return items.length > 0 ? items : (feedCacheMap.get(feedSource.url) || []);
     } catch (error) {
       console.error(`Error fetching feed ${feedSource.name}:`, error);
       // Return cached items if available to avoid empty feeds on transient errors
@@ -279,26 +285,34 @@ let fetchPromise: Promise<any> | null = null;
 
 // Background refresh task
 const refreshCache = async () => {
-  if (isFetching) return;
-  try {
-    isFetching = true;
-    console.log("Refreshing feed cache in background...");
-    const allItems = await fetchFeeds();
-    const responseData = {
-      title: "Aggregated GCP Feeds",
-      description: "Aggregated news and updates from Google Cloud",
-      items: allItems
-    };
-    cache = {
-      data: responseData,
-      timestamp: Date.now()
-    };
-    console.log("Feed cache refreshed successfully.");
-  } catch (error) {
-    console.error("Error in background feed refresh:", error);
-  } finally {
-    isFetching = false;
-  }
+  if (isFetching) return fetchPromise;
+  
+  isFetching = true;
+  fetchPromise = (async () => {
+    try {
+      console.log("Refreshing feed cache...");
+      const allItems = await fetchFeeds();
+      const responseData = {
+        title: "Aggregated GCP Feeds",
+        description: "Aggregated news and updates from Google Cloud",
+        items: allItems
+      };
+      cache = {
+        data: responseData,
+        timestamp: Date.now()
+      };
+      console.log(`Feed cache refreshed successfully with ${allItems.length} items.`);
+      return responseData;
+    } catch (error) {
+      console.error("Error in feed refresh:", error);
+      return cache?.data || { items: [] };
+    } finally {
+      isFetching = false;
+      fetchPromise = null;
+    }
+  })();
+  
+  return fetchPromise;
 };
 
 // Initial fetch and interval
@@ -334,31 +348,9 @@ app.get("/api/feed", async (req, res) => {
     // Return cache immediately if available and fresh
     if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
       responseData = cache.data;
-    } else if (isFetching && fetchPromise) {
-      // If already fetching, wait for the existing promise
-      responseData = await fetchPromise;
     } else {
-      // Otherwise trigger a new fetch
-      isFetching = true;
-      fetchPromise = (async () => {
-        try {
-          const allItems = await fetchFeeds();
-          const data = {
-            title: "Aggregated GCP Feeds",
-            description: "Aggregated news and updates from Google Cloud",
-            items: allItems
-          };
-          cache = {
-            data: data,
-            timestamp: Date.now()
-          };
-          return data;
-        } finally {
-          isFetching = false;
-          fetchPromise = null;
-        }
-      })();
-      responseData = await fetchPromise;
+      // Trigger or wait for refresh
+      responseData = await refreshCache();
     }
 
     let items = responseData.items;

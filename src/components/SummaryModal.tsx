@@ -7,6 +7,8 @@ import { InsightCharts } from './InsightCharts';
 import { AnalysisResult } from '../types';
 import { AILoading } from './ui/AILoading';
 
+import { ContentSkeleton } from './ContentSkeleton';
+
 interface SummaryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -188,21 +190,17 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({ isOpen, onClose, tit
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-24 text-[#5f6368] dark:text-[#9aa0a6]">
-                    {isStreaming ? (
-                        <AILoading 
-                          variant="inline" 
-                          title="Initializing AI Analysis..." 
-                          subtitle="Connecting to Gemini 3 Flash" 
-                          icon={Sparkles}
-                          model={model}
-                        />
-                    ) : (
-                        <div className="text-center">
-                            <Sparkles size={64} className="mx-auto mb-6 opacity-10" />
-                            <p className="text-lg font-medium opacity-50">Analysis not available.</p>
-                        </div>
-                    )}
+                  <div className="space-y-10">
+                    <div className="flex flex-col items-center justify-center py-12 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#202124] rounded-[24px] border border-[#dadce0] dark:border-[#3c4043] mb-10 shadow-sm">
+                      <AILoading 
+                        variant="inline" 
+                        title="Initializing AI Analysis..." 
+                        subtitle="Connecting to Gemini 3 Flash" 
+                        icon={Sparkles}
+                        model={model}
+                      />
+                    </div>
+                    <ContentSkeleton />
                   </div>
                 )}
               </div>
