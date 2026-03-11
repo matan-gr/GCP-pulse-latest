@@ -284,43 +284,75 @@ app.get("/api/health", (req, res) => {
 
 app.get("/api/feed", async (req, res) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 0;
+    const source = req.query.source as string;
+
     // Set Cache-Control header for API response
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600'); // Cache for 5 mins (browser), 10 mins (CDN)
 
+    let responseData;
+
     // Return cache immediately if available and fresh
     if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
-      return res.json(cache.data);
+      responseData = cache.data;
+    } else if (isFetching && fetchPromise) {
+      // If already fetching, wait for the existing promise
+      responseData = await fetchPromise;
+    } else {
+      // Otherwise trigger a new fetch
+      isFetching = true;
+      fetchPromise = (async () => {
+        try {
+          const allItems = await fetchFeeds();
+          const data = {
+            title: "Aggregated GCP Feeds",
+            description: "Aggregated news and updates from Google Cloud",
+            items: allItems
+          };
+          cache = {
+            data: data,
+            timestamp: Date.now()
+          };
+          return data;
+        } finally {
+          isFetching = false;
+          fetchPromise = null;
+        }
+      })();
+      responseData = await fetchPromise;
     }
 
-    // If already fetching, wait for the existing promise
-    if (isFetching && fetchPromise) {
-      const data = await fetchPromise;
-      return res.json(data);
+    let items = responseData.items;
+
+    // Apply source filter if specified
+    if (source) {
+      items = items.filter((item: any) => item.source === source);
     }
 
-    // Otherwise trigger a new fetch
-    isFetching = true;
-    fetchPromise = (async () => {
-      try {
-        const allItems = await fetchFeeds();
-        const responseData = {
-          title: "Aggregated GCP Feeds",
-          description: "Aggregated news and updates from Google Cloud",
-          items: allItems
-        };
-        cache = {
-          data: responseData,
-          timestamp: Date.now()
-        };
-        return responseData;
-      } finally {
-        isFetching = false;
-        fetchPromise = null;
-      }
-    })();
+    // Apply pagination if limit is specified
+    if (limit > 0) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+      const total = items.length;
+      const totalPages = Math.ceil(total / limit);
+      
+      return res.json({
+        ...responseData,
+        items: items.slice(startIndex, endIndex),
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages
+        }
+      });
+    }
 
-    const data = await fetchPromise;
-    res.json(data);
+    res.json({
+      ...responseData,
+      items
+    });
   } catch (error) {
     console.error("Error fetching RSS feeds:", error);
     res.status(500).json({ error: "Failed to fetch RSS feeds" });

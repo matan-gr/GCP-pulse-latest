@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, Suspense, lazy, useRef, useCallback } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
-import { useFeed, useProductDeprecations, useSecurityBulletins, useArchitectureUpdates, useIncidents, useYouTubeFeed } from './hooks/useFeed';
+import { useFeed, useInfiniteFeed, useProductDeprecations, useSecurityBulletins, useArchitectureUpdates, useIncidents, useYouTubeFeed } from './hooks/useFeed';
 import { Toaster } from './components/ui/Toaster';
 import { FeedItem } from './types';
 import { useDebounce } from './hooks/useDebounce';
@@ -37,14 +37,23 @@ function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Data Fetching with React Query
-  const { data: feed, isLoading: feedLoading, error: queryError, refetch: refetchFeed, isRefetching: feedRefetching } = useFeed();
+  const { 
+    data: infiniteFeed, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    isLoading: infiniteLoading,
+    error: infiniteError,
+    refetch: refetchInfinite
+  } = useInfiniteFeed(20);
+
   const { data: deprecations, isLoading: deprecationsLoading, error: deprecationsError } = useProductDeprecations();
   const { data: securityBulletins, isLoading: securityLoading, error: securityError } = useSecurityBulletins();
   const { data: architectureUpdates, isLoading: architectureLoading, error: architectureError } = useArchitectureUpdates();
   const { data: incidents, isLoading: incidentsLoading, error: incidentsError } = useIncidents();
   const { data: youtubeFeed, isLoading: youtubeLoading, error: youtubeError } = useYouTubeFeed();
   
-  const loading = feedLoading || (activeTab === 'architecture' && architectureLoading) || (activeTab === 'incidents' && incidentsLoading) || (activeTab === 'deprecations' && deprecationsLoading) || (activeTab === 'youtube' && youtubeLoading); // Main loading state
+  const loading = (activeTab === 'all' && infiniteLoading) || (activeTab === 'architecture' && architectureLoading) || (activeTab === 'incidents' && incidentsLoading) || (activeTab === 'deprecations' && deprecationsLoading) || (activeTab === 'youtube' && youtubeLoading); // Main loading state
 
   // Custom Hooks
   const { prefs, updatePrefs, toggleCategorySubscription, toggleSavedPost, clearSavedPosts } = useUserPreferences();
@@ -58,24 +67,24 @@ function AppContent() {
   // Feed Update Toast
   const prevRefetching = useRef(false);
   useEffect(() => {
-    if (prevRefetching.current && !feedRefetching && !queryError) {
+    if (prevRefetching.current && !isFetchingNextPage && !infiniteError) {
       toast.success("Feed updated", {
         description: "Latest intelligence and updates have been loaded.",
       });
     }
-    prevRefetching.current = feedRefetching;
-  }, [feedRefetching, queryError]);
+    prevRefetching.current = isFetchingNextPage;
+  }, [isFetchingNextPage, infiniteError]);
 
   // Error Handling
   useEffect(() => {
-    if (queryError) toast.error("Failed to load feed updates", { description: "Please check your connection and try again." });
+    if (infiniteError) toast.error("Failed to load feed updates", { description: "Please check your connection and try again." });
     if (deprecationsError) toast.error("Failed to load product deprecations", { description: "Please check your connection and try again." });
     if (architectureError) toast.error("Failed to load architecture updates", { description: "Please check your connection and try again." });
     if (incidentsError) toast.error("Failed to load incidents", { description: "Please check your connection and try again." });
     if (deprecations && !deprecationsLoading && activeTab === 'deprecations') {
       toast.success("Product deprecations updated", { duration: 3000 });
     }
-  }, [queryError, deprecationsError, architectureError, incidentsError, deprecations, deprecationsLoading, activeTab]);
+  }, [infiniteError, deprecationsError, architectureError, incidentsError, deprecations, deprecationsLoading, activeTab]);
 
   // Search & Filter State
   const [searchMap, setSearchMap] = useState<Record<string, string>>({});
@@ -134,29 +143,26 @@ function AppContent() {
   const allItems = useMemo(() => {
     const itemMap = new Map<string, FeedItem>();
 
-    // 1. Add raw feed items first
-    (feed?.items || []).forEach(item => itemMap.set(item.id, item));
+    // 1. Add infinite feed items
+    infiniteFeed?.pages.forEach(page => {
+      page.items.forEach(item => itemMap.set(item.id, item));
+    });
 
-    // 2. Overlay specialized items (they have enhanced metadata/categories)
+    // 2. Overlay specialized items
     (deprecations || []).forEach(item => itemMap.set(item.id, item));
     (securityBulletins || []).forEach(item => itemMap.set(item.id, item));
     (architectureUpdates || []).forEach(item => itemMap.set(item.id, item));
     (youtubeFeed || []).forEach(item => itemMap.set(item.id, item));
-
-    // 3. Add incidents (distinct source)
     (incidents || []).forEach(item => itemMap.set(item.id, item));
 
     return Array.from(itemMap.values()).sort((a, b) => {
-      // Prioritize active incidents
       const aActive = !!a.isActive;
       const bActive = !!b.isActive;
-      
       if (aActive && !bActive) return -1;
       if (!aActive && bActive) return 1;
-
       return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
     });
-  }, [feed, deprecations, securityBulletins, architectureUpdates, incidents, youtubeFeed]);
+  }, [infiniteFeed, deprecations, securityBulletins, architectureUpdates, incidents, youtubeFeed]);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -344,10 +350,10 @@ function AppContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  if (queryError) {
+  if (infiniteError) {
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <ErrorDisplay message="We couldn't load the latest updates." onRetry={() => refetchFeed()} />
+            <ErrorDisplay message="We couldn't load the latest updates." onRetry={() => refetchInfinite()} />
         </div>
     );
   }
@@ -477,6 +483,9 @@ function AppContent() {
                 onUpdateColumnOrder={(order) => updatePrefs({ columnOrder: order })}
                 onClearFilters={clearAllFilters}
                 search={search}
+                hasNextPage={hasNextPage}
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
               />
             ) : (
               <StandardFeedView

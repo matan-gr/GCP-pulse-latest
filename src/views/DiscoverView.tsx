@@ -7,9 +7,9 @@ import { AnalysisResult } from '../types';
 import { EmptyState } from '../components/EmptyState';
 import { Loader2, LayoutTemplate, AlignJustify, Grid, Download, TrendingUp, Filter, SearchX, X, Search } from 'lucide-react';
 import { UserPreferences } from '../hooks/useUserPreferences';
+import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { useStandardFeedView } from '../hooks/useStandardFeedView';
 import { AILoading } from '../components/ui/AILoading';
 
 import { getCategoryColor, getCategoryStyles, cn } from '../utils';
@@ -30,6 +30,9 @@ interface DiscoverViewProps {
   onUpdateColumnOrder: (order: string[]) => void;
   onClearFilters?: () => void;
   search?: string;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 export const DiscoverView: React.FC<DiscoverViewProps> = ({
@@ -46,6 +49,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   isAiLoading,
   onClearFilters,
   search = '',
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
 }) => {
   // View Customization State
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -73,8 +79,6 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 
   const popularCategories = categoryStats.popular;
 
-  const { visibleItems, loadMoreRef, hasMore } = useStandardFeedView(allFeedItems);
-
   // Split into Featured and Regular items
   const featuredItems = useMemo(() => {
     // Top 2 items if they are "New"
@@ -87,8 +91,17 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 
   const regularItems = useMemo(() => {
     const featuredLinks = new Set(featuredItems.map(i => i.link));
-    return visibleItems.filter(item => !featuredLinks.has(item.link));
-  }, [visibleItems, featuredItems]);
+    return allFeedItems.filter(item => !featuredLinks.has(item.link));
+  }, [allFeedItems, featuredItems]);
+
+  // Trigger fetchNextPage when sentinel is in view
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '200px' });
+
+  React.useEffect(() => {
+    if (inView && hasNextPage && fetchNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   const handleExportHTML = () => {
     if (allFeedItems.length === 0) {
@@ -377,7 +390,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             ))}
             
             {/* Load More Sentinel */}
-            {hasMore ? (
+            {hasNextPage ? (
               <div ref={loadMoreRef} className="col-span-full flex justify-center py-8">
                 <div className="flex items-center space-x-2 text-[#5f6368] dark:text-[#9aa0a6]">
                   <Loader2 className="animate-spin" size={24} />
