@@ -17,7 +17,7 @@ export const useSummarizer = () => {
   } | null>(null);
 
   const handleSummarize = async (item: FeedItem) => {
-    // If we already have an analysis, just open the modal
+    // 1. Check local state first
     if (analyses[item.link]) {
       setSummaryModal({
         isOpen: true,
@@ -26,6 +26,24 @@ export const useSummarizer = () => {
         isStreaming: false
       });
       return;
+    }
+
+    // 2. Check backend cache
+    try {
+      const res = await fetch(`/api/summaries/${encodeURIComponent(item.link)}`);
+      if (res.ok) {
+        const cachedAnalysis = await res.json();
+        setAnalyses(prev => ({ ...prev, [item.link]: cachedAnalysis }));
+        setSummaryModal({
+          isOpen: true,
+          title: item.title,
+          analysis: cachedAnalysis,
+          isStreaming: false
+        });
+        return;
+      }
+    } catch (e) {
+      console.error("Failed to fetch summary from backend cache", e);
     }
 
     if (!checkRateLimit('summarization', 10, 30)) {
@@ -156,6 +174,17 @@ export const useSummarizer = () => {
       };
 
       setAnalyses(prev => ({ ...prev, [item.link]: analysis }));
+      
+      // Save to backend cache
+      try {
+        await fetch('/api/summaries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: item.link, analysis })
+        });
+      } catch (e) {
+        console.error("Failed to save summary to backend cache", e);
+      }
       
       setSummaryModal(prev => prev ? { 
         ...prev, 

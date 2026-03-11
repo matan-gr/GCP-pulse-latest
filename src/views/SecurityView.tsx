@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FeedItem } from '../types';
-import { ShieldAlert, ShieldCheck, Search, Filter, AlertTriangle, CheckCircle, ExternalLink, Zap, Shield, Activity, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Search, Filter, AlertTriangle, ExternalLink, Shield, Activity, ChevronDown, ChevronUp, Sparkles, Loader2, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSecurityView } from '../hooks/useSecurityView';
 import DOMPurify from 'dompurify';
@@ -50,19 +50,19 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       
       {/* Header & Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-2xl shadow-lg text-white relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-            <Shield size={100} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white dark:bg-[#202124] p-6 rounded-2xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+          <div className="absolute -bottom-4 -right-4 opacity-5 transform rotate-12 scale-150 transition-transform group-hover:scale-125 duration-500">
+            <Shield size={80} className="text-[#1a73e8]" />
           </div>
           <div className="relative z-10">
-            <p className="text-blue-100 text-xs font-bold uppercase tracking-wider mb-1">Total Bulletins</p>
-            <h3 className="text-4xl font-extrabold">{processedData.stats.total}</h3>
-            <div className="mt-4 flex items-center text-blue-100 text-sm">
-              <Activity size={14} className="mr-1" />
+            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[10px] font-bold uppercase tracking-widest mb-1">Total Bulletins</p>
+            <h3 className="text-3xl font-black text-[#202124] dark:text-[#e8eaed]">{processedData.stats.total}</h3>
+            <div className="mt-4 flex items-center text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold uppercase tracking-widest">
+              <Activity size={12} className="mr-1.5" />
               <span>Active Monitoring</span>
             </div>
           </div>
@@ -89,18 +89,18 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
       </div>
 
       {/* Controls */}
-      <div className="sticky top-[72px] z-20 bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-[#3c4043]/50 shadow-lg flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
+      <div className="sticky top-[64px] z-20 bg-white/80 dark:bg-[#0f0f0f]/80 backdrop-blur-xl p-3 sm:p-4 rounded-2xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
         <div className="flex items-center space-x-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
-          <div className="mr-3 p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
-            <Filter size={18} />
+          <div className="mr-2 p-2 bg-[#f1f3f4] dark:bg-[#3c4043] rounded-xl text-[#5f6368] dark:text-[#9aa0a6]">
+            <Filter size={16} />
           </div>
           {(['All', 'Critical', 'High', 'Medium', 'Low'] as const).map(sev => (
             <button
               key={sev}
               onClick={() => setSeverityFilter(sev)}
-              className={`px-5 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                 severityFilter === sev 
-                  ? 'bg-[#1a73e8] text-white shadow-md scale-105' 
+                  ? 'bg-[#1a73e8] text-white shadow-sm' 
                   : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043]'
               }`}
             >
@@ -110,13 +110,13 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
         </div>
 
         <div className="relative w-full md:w-80 group">
-          <Search size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+          <Search size={16} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5f6368] dark:text-[#9aa0a6] group-focus-within:text-[#1a73e8] transition-colors" />
           <input 
             type="text" 
             placeholder="Search bulletins, CVEs, products..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-[#303134] border border-[#dadce0] dark:border-[#3c4043] rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium"
+            className="w-full pl-11 pr-4 py-2.5 bg-[#f1f3f4] dark:bg-[#303134] border border-transparent focus:bg-white dark:focus:bg-[#202124] focus:border-[#1a73e8] dark:focus:border-[#8ab4f8] rounded-xl outline-none transition-all text-[13px] font-medium text-[#202124] dark:text-[#e8eaed]"
           />
         </div>
       </div>
@@ -138,13 +138,13 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700"
+              className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#202124] rounded-2xl border border-dashed border-[#dadce0] dark:border-[#3c4043]"
             >
-              <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                <ShieldCheck size={32} className="text-slate-300 dark:text-slate-600" />
+              <div className="w-16 h-16 bg-[#f1f3f4] dark:bg-[#3c4043] rounded-full flex items-center justify-center mb-4">
+                <ShieldCheck size={32} className="text-[#dadce0] dark:text-[#5f6368]" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">No bulletins found</h3>
-              <p className="text-slate-500 mt-2 text-sm">Try adjusting your filters or search terms.</p>
+              <h3 className="text-md font-bold text-[#202124] dark:text-[#e8eaed]">No bulletins found</h3>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] mt-1 text-[12px]">Try adjusting your filters or search terms.</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -160,94 +160,104 @@ const SecurityItemCard = ({ item, index, onSummarize, summarizingId }: { item: F
   const contentToRender = item.content || item.contentSnippet || '';
   const sanitizedContent = DOMPurify.sanitize(contentToRender);
 
+  const getSeverityBorder = (severity: string) => {
+    switch (severity) {
+      case 'Critical': return 'border-l-rose-500';
+      case 'High': return 'border-l-orange-500';
+      case 'Medium': return 'border-l-amber-500';
+      default: return 'border-l-blue-500';
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ delay: index * 0.05 }}
-      onClick={() => window.open(item.link, '_blank')}
-      className={`group relative rounded-3xl border shadow-sm overflow-hidden transition-all hover:shadow-xl bg-white dark:bg-[#202124] cursor-pointer border-[#dadce0] dark:border-[#3c4043] hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 ${
-        item.severity === 'Critical' ? 'border-l-[6px] border-l-red-500' :
-        item.severity === 'High' ? 'border-l-[6px] border-l-orange-500' :
-        item.severity === 'Medium' ? 'border-l-[6px] border-l-yellow-500' :
-        'border-l-[6px] border-l-blue-500'
-      }`}
+      className={cn(
+        "group relative rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md bg-white dark:bg-[#202124] border-[#dadce0] dark:border-[#3c4043] hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 border-l-[6px]",
+        getSeverityBorder(item.severity)
+      )}
     >
-      <div className="p-8">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
-          <div className="space-y-4 flex-1">
-            <div className="flex items-center gap-3 flex-wrap">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
               <SeverityBadge severity={item.severity} />
-              <span className="text-[11px] font-bold text-[#5f6368] dark:text-[#9aa0a6] flex items-center bg-[#f1f3f4] dark:bg-[#3c4043] px-3 py-1 rounded-lg uppercase tracking-widest">
+              <span className="text-[9px] font-bold text-[#5f6368] dark:text-[#9aa0a6] flex items-center bg-[#f1f3f4] dark:bg-[#3c4043] px-2 py-0.5 rounded text-center uppercase tracking-widest border border-[#dadce0] dark:border-[#5f6368]">
                 {new Date(item.isoDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
               </span>
             </div>
-            <h3 className="text-2xl font-heading font-bold text-[#202124] dark:text-slate-100 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <h3 className="text-lg font-heading font-semibold text-[#202124] dark:text-[#e8eaed] leading-snug group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors tracking-tight">
               <a href={item.link} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                 {item.title}
               </a>
             </h3>
           </div>
           
-          <div className="flex items-center gap-3 flex-shrink-0 self-start">
+          <div className="flex items-center gap-2 flex-shrink-0 self-start">
             <button 
               onClick={(e) => { e.stopPropagation(); onSummarize(item); }}
               disabled={summarizingId === item.link}
-              className="flex items-center px-5 py-2.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50 border border-blue-100 dark:border-blue-800/50 shadow-sm hover:shadow"
+              className="inline-flex items-center px-3 py-1.5 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#202124] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shadow-sm"
             >
-              <Zap size={14} className={`mr-2 ${summarizingId === item.link ? 'animate-spin' : 'fill-blue-500 text-blue-600'}`} />
-              {summarizingId === item.link ? 'Analyzing...' : 'AI Analysis'}
+              {summarizingId === item.link ? (
+                <Loader2 size={12} className="animate-spin mr-1.5" />
+              ) : (
+                <Sparkles size={12} className="mr-1.5" />
+              )}
+              {summarizingId === item.link ? 'Analyzing' : 'Summarize'}
             </button>
             <a 
               href={item.link} 
               target="_blank" 
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-3 text-[#5f6368] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors"
+              className="p-2 text-[#5f6368] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:bg-[#f1f3f4] dark:hover:bg-[#3c4043] rounded-full transition-colors border border-[#dadce0] dark:border-[#5f6368]"
               title="View Official Bulletin"
             >
-              <ExternalLink size={20} />
+              <ExternalLink size={16} />
             </a>
           </div>
         </div>
 
-        <div className={`relative ${isExpanded ? '' : 'max-h-32 overflow-hidden mask-linear-fade'}`}>
+        <div className={`relative ${isExpanded ? '' : 'max-h-24 overflow-hidden mask-linear-fade'}`}>
            <div 
-             className="prose dark:prose-invert max-w-none text-sm text-slate-600 dark:text-slate-300 leading-relaxed prose-headings:font-bold prose-headings:text-slate-900 dark:prose-headings:text-white prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-pink-600 dark:prose-code:text-pink-400 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
+             className="prose dark:prose-invert max-w-none text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed prose-headings:font-bold prose-headings:text-[#202124] dark:prose-headings:text-[#e8eaed] prose-a:text-[#1a73e8] dark:prose-a:text-[#8ab4f8] prose-code:text-pink-600 dark:prose-code:text-pink-400 prose-code:bg-[#f1f3f4] dark:prose-code:bg-[#3c4043] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
            />
         </div>
         
         <button 
           onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
-          className="mt-4 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center uppercase tracking-wide transition-colors focus:outline-none"
+          className="mt-3 text-[10px] font-bold text-[#1a73e8] dark:text-[#8ab4f8] hover:underline flex items-center uppercase tracking-widest transition-colors focus:outline-none"
         >
           {isExpanded ? (
-            <>Show Less <ChevronUp size={12} className="ml-1" /></>
+            <>Less <ChevronUp size={10} className="ml-1" /></>
           ) : (
-            <>Read Full Bulletin <ChevronDown size={12} className="ml-1" /></>
+            <>More <ChevronDown size={10} className="ml-1" /></>
           )}
         </button>
 
         {item.products.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-5 border-t border-slate-100 dark:border-slate-800 mt-4">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center shrink-0">
-              <Search size={12} className="mr-1.5" />
-              Affected Products
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-4 border-t border-[#dadce0] dark:border-[#3c4043] mt-4">
+            <span className="text-[9px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-widest flex items-center shrink-0">
+              <Tag size={10} className="mr-1.5 opacity-70" />
+              Affected
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {item.products.slice(0, 6).map(prod => (
                 <span key={prod} className={cn(
-                  "px-2.5 py-1 text-[10px] rounded-md font-black uppercase tracking-widest border transition-all duration-300",
+                  "px-2 py-0.5 text-[9px] rounded-md font-black uppercase tracking-widest border transition-all duration-300",
                   getCategoryStyles(prod)
                 )}>
                   {prod}
                 </span>
               ))}
               {item.products.length > 6 && (
-                <span className="px-2 py-1 bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-[10px] rounded-md font-bold border border-transparent">
-                  +{item.products.length - 6} more
+                <span className="px-2 py-0.5 bg-[#f1f3f4] dark:bg-[#3c4043] text-[#5f6368] dark:text-[#9aa0a6] text-[9px] rounded-md font-bold border border-[#dadce0] dark:border-[#5f6368]">
+                  +{item.products.length - 6}
                 </span>
               )}
             </div>
@@ -260,17 +270,17 @@ const SecurityItemCard = ({ item, index, onSummarize, summarizingId }: { item: F
 
 const StatCard = ({ label, value, icon: Icon, color }: any) => {
   const colors = {
-    red: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/30',
+    red: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30',
     orange: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900/30',
-    yellow: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100 dark:border-yellow-900/30',
+    yellow: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-900/30',
   };
 
   const activeColor = colors[color as keyof typeof colors];
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-[#202124] p-6 rounded-2xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
       <div className="flex justify-between items-start mb-4">
-        <div className={`p-3 rounded-xl ${activeColor}`}>
+        <div className={`p-3 rounded-xl border ${activeColor}`}>
           <Icon size={24} />
         </div>
         {/* Decorative background icon */}
@@ -279,32 +289,32 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
         </div>
       </div>
       <div>
-        <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">{value}</h3>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</p>
+        <h3 className="text-3xl font-black text-[#202124] dark:text-[#e8eaed] mb-1">{value}</h3>
+        <p className="text-[10px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-widest">{label}</p>
       </div>
     </div>
   );
 };
 
 const SeverityBadge = ({ severity }: { severity: string }) => {
-  let styles = 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-800';
+  let styles = 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
   let Icon = Shield;
 
   if (severity === 'Critical') {
-    styles = 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800';
+    styles = 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800';
     Icon = ShieldAlert;
   } else if (severity === 'High') {
-    styles = 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-800';
+    styles = 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
     Icon = AlertTriangle;
   } else if (severity === 'Medium') {
-    styles = 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-800';
+    styles = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800';
     Icon = ShieldCheck;
   }
 
   return (
-    <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center border shadow-sm ${styles}`}>
-      <Icon size={14} className="mr-1.5" />
-      {severity} Severity
+    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest flex items-center border shadow-sm ${styles}`}>
+      <Icon size={12} className="mr-1.5" />
+      {severity}
     </span>
   );
 };

@@ -98,6 +98,12 @@ const youtubeCache = {
   CACHE_DURATION: 1000 * 60 * 60, // 1 hour
 };
 
+// In-memory cache for individual summaries
+const summariesCache: Record<string, any> = {};
+
+// Feed cache map to preserve data on fetch failure
+const feedCacheMap = new Map<string, any[]>();
+
 // Helper to enrich YouTube items using YouTube Data API v3
 const enrichYouTubeItems = async (items: any[]) => {
   const youtubeItems = items.filter(item => item.source === "Google Cloud YouTube");
@@ -207,10 +213,12 @@ const fetchFeeds = async () => {
         isoDate: item.isoDate || (item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString())
       }));
       
+      feedCacheMap.set(feedSource.url, items);
       return items;
     } catch (error) {
       console.error(`Error fetching feed ${feedSource.name}:`, error);
-      return [];
+      // Return cached items if available to avoid empty feeds on transient errors
+      return feedCacheMap.get(feedSource.url) || [];
     }
   });
 
@@ -238,10 +246,14 @@ let cache: {
   timestamp: number;
 } | null = null;
 const CACHE_DURATION = 1000 * 60 * 60; // 60 minutes cache
+let isFetching = false;
+let fetchPromise: Promise<any> | null = null;
 
 // Background refresh task
 const refreshCache = async () => {
+  if (isFetching) return;
   try {
+    isFetching = true;
     console.log("Refreshing feed cache in background...");
     const allItems = await fetchFeeds();
     const responseData = {
@@ -256,6 +268,8 @@ const refreshCache = async () => {
     console.log("Feed cache refreshed successfully.");
   } catch (error) {
     console.error("Error in background feed refresh:", error);
+  } finally {
+    isFetching = false;
   }
 };
 
@@ -273,29 +287,67 @@ app.get("/api/feed", async (req, res) => {
     // Set Cache-Control header for API response
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600'); // Cache for 5 mins (browser), 10 mins (CDN)
 
-    // Return cache immediately if available
-    if (cache) {
+    // Return cache immediately if available and fresh
+    if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
       return res.json(cache.data);
     }
 
-    // Fallback if cache is not yet ready (e.g. immediately after server start)
-    const allItems = await fetchFeeds();
-    const responseData = {
-      title: "Aggregated GCP Feeds",
-      description: "Aggregated news and updates from Google Cloud",
-      items: allItems
-    };
+    // If already fetching, wait for the existing promise
+    if (isFetching && fetchPromise) {
+      const data = await fetchPromise;
+      return res.json(data);
+    }
 
-    cache = {
-      data: responseData,
-      timestamp: Date.now()
-    };
+    // Otherwise trigger a new fetch
+    isFetching = true;
+    fetchPromise = (async () => {
+      try {
+        const allItems = await fetchFeeds();
+        const responseData = {
+          title: "Aggregated GCP Feeds",
+          description: "Aggregated news and updates from Google Cloud",
+          items: allItems
+        };
+        cache = {
+          data: responseData,
+          timestamp: Date.now()
+        };
+        return responseData;
+      } finally {
+        isFetching = false;
+        fetchPromise = null;
+      }
+    })();
 
-    res.json(responseData);
+    const data = await fetchPromise;
+    res.json(data);
   } catch (error) {
     console.error("Error fetching RSS feeds:", error);
     res.status(500).json({ error: "Failed to fetch RSS feeds" });
   }
+});
+
+app.get("/api/summaries", (req, res) => {
+  res.json(summariesCache);
+});
+
+app.get("/api/summaries/:id", (req, res) => {
+  const { id } = req.params;
+  const decodedId = decodeURIComponent(id);
+  const summary = summariesCache[decodedId];
+  if (summary) {
+    res.json(summary);
+  } else {
+    res.status(404).json({ error: "Summary not found" });
+  }
+});
+
+app.post("/api/summaries", (req, res) => {
+  const { id, analysis } = req.body;
+  if (!id || !analysis) return res.status(400).json({ error: "Missing id or analysis" });
+  
+  summariesCache[id] = analysis;
+  res.json({ success: true });
 });
 
 app.get("/api/debug-key", (req, res) => {
