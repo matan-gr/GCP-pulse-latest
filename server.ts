@@ -8,6 +8,7 @@ import 'dotenv/config';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,28 @@ const parser = new Parser({
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '10mb' })); // Increased limit for large payloads
+app.use(cookieParser());
+
+// Hidden Unique User Counter Middleware
+app.use((req, res, next) => {
+  totalVisits++;
+  
+  // Track by IP
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  if (ip !== 'unknown') {
+    uniqueIPs.add(ip);
+  }
+
+  // Track by Cookie
+  let uid = req.cookies.pulse_uid;
+  if (!uid) {
+    uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    res.cookie('pulse_uid', uid, { maxAge: 1000 * 60 * 60 * 24 * 365, httpOnly: true, sameSite: 'none', secure: true });
+  }
+  uniqueUsers.add(uid);
+  
+  next();
+});
 
 // Compression Middleware
 app.use(compression());
@@ -100,6 +123,11 @@ const youtubeCache = {
 
 // In-memory cache for individual summaries
 const summariesCache: Record<string, any> = {};
+
+// Unique User Tracking (Hidden)
+const uniqueUsers = new Set<string>();
+const uniqueIPs = new Set<string>();
+let totalVisits = 0;
 
 // Feed cache map to preserve data on fetch failure
 const feedCacheMap = new Map<string, any[]>();
@@ -280,6 +308,16 @@ setInterval(refreshCache, CACHE_DURATION);
 // API Routes
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
+});
+
+// Hidden Stats Endpoint
+app.get("/api/health/stats", (req, res) => {
+  res.json({
+    uniqueUsers: uniqueUsers.size,
+    uniqueIPs: uniqueIPs.size,
+    totalVisits,
+    uptime: process.uptime()
+  });
 });
 
 app.get("/api/feed", async (req, res) => {
