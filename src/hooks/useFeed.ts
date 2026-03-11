@@ -1,15 +1,11 @@
 
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Feed, FeedItem } from '../types';
 import { extractGCPProducts, cleanText } from '../utils';
 
-const fetchFeed = async (page = 1, limit = 0, source?: string): Promise<Feed> => {
+const fetchFeed = async (): Promise<Feed> => {
   try {
-    let url = limit > 0 ? `/api/feed?page=${page}&limit=${limit}` : '/api/feed';
-    if (source) {
-      url += (url.includes('?') ? '&' : '?') + `source=${encodeURIComponent(source)}`;
-    }
-    const response = await fetch(url);
+    const response = await fetch('/api/feed');
     if (!response.ok) {
       throw new Error(`Failed to fetch feed: ${response.status} ${response.statusText}`);
     }
@@ -22,32 +18,18 @@ const fetchFeed = async (page = 1, limit = 0, source?: string): Promise<Feed> =>
 
 export const useFeed = () => {
   return useQuery({
-    queryKey: ['feed', 'all'],
-    queryFn: () => fetchFeed(),
-    staleTime: 1000 * 60, // 1 minute
+    queryKey: ['feed'],
+    queryFn: fetchFeed,
+    staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes
-  });
-};
-
-export const useInfiniteFeed = (limit = 20, source?: string) => {
-  return useInfiniteQuery({
-    queryKey: ['feed', 'infinite', limit, source],
-    queryFn: ({ pageParam = 1 }) => fetchFeed(pageParam as number, limit, source),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.pagination) return undefined;
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    },
-    staleTime: 1000 * 60, // 1 minute
   });
 };
 
 export const useProductDeprecations = () => {
   return useQuery({
-    queryKey: ['feed', 'deprecations'],
-    queryFn: () => fetchFeed(1, 0, 'Release Notes'),
-    staleTime: 1000 * 60, // 1 minute
+    queryKey: ['feed'], // Share cache with useFeed
+    queryFn: fetchFeed,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => {
         // We are looking for items from "Release Notes" that are about deprecations.
@@ -108,9 +90,9 @@ export const useProductDeprecations = () => {
 
 export const useSecurityBulletins = () => {
   return useQuery({
-    queryKey: ['feed', 'security'],
-    queryFn: () => fetchFeed(1, 0, 'Security Bulletins'),
-    staleTime: 1000 * 60, // 1 minute
+    queryKey: ['feed'], // Share cache with useFeed
+    queryFn: fetchFeed,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Security Bulletins').map(item => {
         // Robust Severity Extraction
@@ -144,9 +126,9 @@ export const useSecurityBulletins = () => {
 
 export const useArchitectureUpdates = () => {
   return useQuery({
-    queryKey: ['feed', 'architecture'],
-    queryFn: () => fetchFeed(1, 0, 'Architecture Center'),
-    staleTime: 1000 * 60, // 1 minute
+    queryKey: ['feed'], // Share cache with useFeed
+    queryFn: fetchFeed,
+    staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Architecture Center').map(item => {
         let title = item.title;
@@ -229,8 +211,8 @@ export const useIncidents = () => {
 
 export const useYouTubeFeed = () => {
   return useQuery({
-    queryKey: ['feed', 'youtube'],
-    queryFn: () => fetchFeed(1, 0, 'Google Cloud YouTube'),
+    queryKey: ['feed'], // Share cache with useFeed
+    queryFn: fetchFeed,
     staleTime: 1000 * 60 * 5,
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Google Cloud YouTube');

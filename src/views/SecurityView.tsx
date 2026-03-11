@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useSecurityView } from '../hooks/useSecurityView';
 import DOMPurify from 'dompurify';
 import { getCategoryStyles, cn } from '../utils';
-import { SecuritySkeletonCard } from '../components/SecuritySkeletonCard';
 
 // Configure DOMPurify to open links in new tab
 DOMPurify.addHook('afterSanitizeAttributes', function (node) {
@@ -39,18 +38,12 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="bg-white dark:bg-[#202124] p-6 rounded-2xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm h-32 animate-pulse">
-              <div className="h-3 w-20 bg-[#f1f3f4] dark:bg-[#303134] rounded mb-4" />
-              <div className="h-8 w-16 bg-[#f1f3f4] dark:bg-[#303134] rounded mb-2" />
-              <div className="h-3 w-24 bg-[#f1f3f4] dark:bg-[#303134] rounded" />
-            </div>
-          ))}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
         </div>
         <div className="space-y-4">
-          {[1, 2, 3, 4].map(i => <SecuritySkeletonCard key={i} />)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-40 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
         </div>
       </div>
     );

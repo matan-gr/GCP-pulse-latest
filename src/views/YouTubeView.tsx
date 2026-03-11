@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { FeedItem } from '../types';
 import { motion } from 'motion/react';
-import { Youtube, ExternalLink, Calendar, Play, Clock, Eye, ThumbsUp, Key } from 'lucide-react';
+import { Youtube, ExternalLink, Calendar, Play, Clock, Eye, ThumbsUp } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
 import { getCategoryStyles, cn } from '../utils';
 
@@ -12,15 +12,6 @@ interface YouTubeViewProps {
 }
 
 export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClearFilters }) => {
-  const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    fetch('/api/debug-key')
-      .then(res => res.json())
-      .then(data => setHasApiKey(data.hasYouTubeKey))
-      .catch(() => setHasApiKey(false));
-  }, []);
-
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -38,31 +29,6 @@ export const YouTubeView: React.FC<YouTubeViewProps> = ({ items, loading, onClea
   }
 
   if (items.length === 0) {
-    if (hasApiKey === false) {
-      return (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#202124] rounded-3xl border border-[#dadce0] dark:border-[#3c4043] shadow-sm max-w-2xl mx-auto mt-12">
-          <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mb-6">
-            <Key className="w-8 h-8 text-red-500" />
-          </div>
-          <h3 className="text-xl font-heading font-bold text-[#202124] dark:text-slate-100 mb-3">
-            YouTube API Key Required
-          </h3>
-          <p className="text-[#5f6368] dark:text-slate-400 mb-6 max-w-md">
-            The YouTube RSS feed is currently blocking requests from cloud servers (429 Too Many Requests). To fetch the latest videos, you need to provide a YouTube Data API key.
-          </p>
-          <div className="bg-[#f8f9fa] dark:bg-[#303134] p-4 rounded-xl text-left w-full border border-[#dadce0] dark:border-[#3c4043]">
-            <h4 className="text-sm font-bold text-[#202124] dark:text-slate-100 mb-2">How to fix this:</h4>
-            <ol className="list-decimal list-inside text-xs text-[#5f6368] dark:text-slate-400 space-y-2">
-              <li>Get an API key from the <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer" className="text-[#1a73e8] dark:text-[#8ab4f8] hover:underline">Google Cloud Console</a>.</li>
-              <li>Open the <strong>Settings</strong> menu in AI Studio (gear icon).</li>
-              <li>Add a new secret named <code className="bg-white dark:bg-[#202124] px-1.5 py-0.5 rounded border border-[#dadce0] dark:border-[#5f6368] font-mono">YOUTUBE_API_KEY</code> and paste your key.</li>
-              <li>Restart the dev server.</li>
-            </ol>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <EmptyState 
         icon={Youtube}

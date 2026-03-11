@@ -8,9 +8,6 @@ import 'dotenv/config';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-
-import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,14 +26,15 @@ const FEEDS = [
   { url: "https://cloudblog.withgoogle.com/rss/", name: "Cloud Blog" },
   { url: "https://blog.google/products/google-cloud/rss/", name: "Product Updates" },
   { url: "https://cloud.google.com/feeds/gcp-release-notes.xml", name: "Release Notes" },
-  { url: "https://cloud.google.com/feeds/google-cloud-security-bulletins.xml", name: "Security Bulletins" },
+  { url: "https://docs.cloud.google.com/feeds/google-cloud-security-bulletins.xml", name: "Security Bulletins" },
   { url: "https://cloud.google.com/feeds/architecture-center-release-notes.xml", name: "Architecture Center" },
-  { url: "https://blog.google/technology/ai/rss/", name: "Google AI Research" },
+  { url: "http://googleaiblog.blogspot.com/atom.xml", name: "Google AI Research" },
   { url: "https://docs.cloud.google.com/feeds/gemini-enterprise-release-notes.xml", name: "Gemini Enterprise" },
-  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
+  { url: "https://corsproxy.io/?https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
 ];
 
 const parser = new Parser({
+  timeout: 5000, // 5 seconds timeout for RSS feeds
   customFields: {
     item: [
       ['media:group', 'mediaGroup'],
@@ -47,37 +45,8 @@ const parser = new Parser({
   }
 });
 
-const FETCH_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-  'Accept': 'application/rss+xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8',
-  'Cache-Control': 'no-cache',
-  'Pragma': 'no-cache'
-};
-
 // Middleware to parse JSON
 app.use(express.json({ limit: '10mb' })); // Increased limit for large payloads
-app.use(cookieParser());
-
-// Hidden Unique User Counter Middleware
-app.use((req, res, next) => {
-  totalVisits++;
-  
-  // Track by IP
-  const ip = req.ip || req.socket.remoteAddress || 'unknown';
-  if (ip !== 'unknown') {
-    uniqueIPs.add(ip);
-  }
-
-  // Track by Cookie
-  let uid = req.cookies.pulse_uid;
-  if (!uid) {
-    uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    res.cookie('pulse_uid', uid, { maxAge: 1000 * 60 * 60 * 24 * 365, httpOnly: true, sameSite: 'none', secure: true });
-  }
-  uniqueUsers.add(uid);
-  
-  next();
-});
 
 // Compression Middleware
 app.use(compression());
@@ -90,8 +59,8 @@ app.use(helmet({
 
 // Rate Limiting Middleware
 const limiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 150, // Limit each IP to 150 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again later.'
@@ -106,17 +75,6 @@ const cleanText = (text: string | undefined) => {
     .replace(/&nbsp;/g, " ") // Replace &nbsp;
     .replace(/\s+/g, " ") // Normalize whitespace
     .trim();
-};
-
-// Helper to sanitize XML before parsing
-const sanitizeXml = (xml: string) => {
-  if (!xml) return "";
-  // 1. Remove invalid XML characters
-  const sanitized = xml.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g, "");
-  
-  // 2. Replace stray ampersands that are not part of an entity
-  // This regex matches '&' that is NOT followed by (a-z or # and then digits) and then ';'
-  return sanitized.replace(/&(?!(?:[a-zA-Z]+|#[0-9]+|#x[0-9a-fA-F]+);)/g, '&amp;');
 };
 
 // Helper to format ISO 8601 duration
@@ -142,11 +100,6 @@ const youtubeCache = {
 
 // In-memory cache for individual summaries
 const summariesCache: Record<string, any> = {};
-
-// Unique User Tracking (Hidden)
-const uniqueUsers = new Set<string>();
-const uniqueIPs = new Set<string>();
-let totalVisits = 0;
 
 // Feed cache map to preserve data on fetch failure
 const feedCacheMap = new Map<string, any[]>();
@@ -217,7 +170,6 @@ const enrichYouTubeItems = async (items: any[]) => {
     const enrichedItems = await Promise.all(items.map(async (item) => {
       const videoId = videoIds.find(id => item.link?.includes(id) || item.id?.includes(id));
       const details = allDetails.find(d => d.id === videoId);
-      console.log(`Enriching item ${item.id}, videoId: ${videoId}, found details: ${!!details}`);
       if (details) {
         // Use existing tags from YouTube
         const labels = details.snippet.tags || [];
@@ -226,14 +178,12 @@ const enrichYouTubeItems = async (items: any[]) => {
           ...item,
           duration: formatDuration(details.contentDetails.duration),
           viewCount: parseInt(details.statistics.viewCount, 10),
-          likeCount: parseInt(details.statistics.likeCount || '0', 10),
+          likeCount: parseInt(details.statistics.likeCount, 10),
           channelTitle: details.snippet.channelTitle,
           categories: labels,
           videoId: details.id,
           thumbnailUrl: details.snippet.thumbnails?.maxres?.url || details.snippet.thumbnails?.high?.url || details.snippet.thumbnails?.medium?.url || details.snippet.thumbnails?.default?.url
         };
-      } else if (item.source === "Google Cloud YouTube") {
-        console.warn(`No details found for video ID: ${videoId}, allDetails length: ${allDetails.length}`);
       }
       return item;
     }));
@@ -253,70 +203,8 @@ const enrichYouTubeItems = async (items: any[]) => {
 const fetchFeeds = async () => {
   const feedPromises = FEEDS.map(async (feedSource) => {
     try {
-      if (feedSource.name === "Google Cloud YouTube") {
-        const apiKey = (process.env.YOUTUBE_API_KEY || '').trim().replace(/^["']|["']$/g, '');
-        if (!apiKey) {
-          console.warn(`[${new Date().toISOString()}] YOUTUBE_API_KEY is missing. Skipping YouTube feed.`);
-          return feedCacheMap.get(feedSource.url) || [];
-        }
-
-        console.log(`[${new Date().toISOString()}] Fetching YouTube videos via Data API...`);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=UUJS9pqu9BzkAMNTmzNMNhvg&maxResults=20&key=${apiKey}`, {
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          console.error(`[${new Date().toISOString()}] YouTube API error: ${response.statusText}`);
-          return feedCacheMap.get(feedSource.url) || [];
-        }
-
-        const data = await response.json();
-        const items = (data.items || []).map((item: any) => ({
-          id: `yt:video:${item.snippet.resourceId.videoId}`,
-          title: cleanText(item.snippet.title),
-          link: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
-          isoDate: new Date(item.snippet.publishedAt).toISOString(),
-          contentSnippet: cleanText(item.snippet.description),
-          content: cleanText(item.snippet.description),
-          source: feedSource.name,
-          videoId: item.snippet.resourceId.videoId,
-          channelId: item.snippet.channelId,
-          author: item.snippet.channelTitle
-        }));
-
-        if (items.length > 0) {
-          feedCacheMap.set(feedSource.url, items);
-          console.log(`[${new Date().toISOString()}] Successfully fetched ${items.length} items for ${feedSource.name}`);
-        }
-        return items.length > 0 ? items : (feedCacheMap.get(feedSource.url) || []);
-      }
-
-      console.log(`[${new Date().toISOString()}] Fetching ${feedSource.name} from ${feedSource.url}...`);
-      
-      const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 30000); // 30s timeout
-
-      const response = await fetch(feedSource.url, {
-        headers: FETCH_HEADERS,
-        signal: abortController.signal,
-        redirect: 'follow'
-      });
-      
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.error(`[${new Date().toISOString()}] HTTP ${response.status} for ${feedSource.name}`);
-        return feedCacheMap.get(feedSource.url) || [];
-      }
-
-      const rawData = await response.text();
-      const sanitizedData = sanitizeXml(rawData);
-      const feed = await parser.parseString(sanitizedData);
-      const items = (feed.items || []).map(item => ({
+      const feed = await parser.parseURL(feedSource.url);
+      const items = feed.items.map(item => ({
         ...item,
         source: feedSource.name,
         title: cleanText(item.title),
@@ -325,15 +213,11 @@ const fetchFeeds = async () => {
         isoDate: item.isoDate || (item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString())
       }));
       
-      if (items.length > 0) {
-        feedCacheMap.set(feedSource.url, items);
-        console.log(`[${new Date().toISOString()}] Successfully fetched ${items.length} items for ${feedSource.name}`);
-      } else {
-        console.warn(`[${new Date().toISOString()}] Feed ${feedSource.name} returned 0 items.`);
-      }
-      return items.length > 0 ? items : (feedCacheMap.get(feedSource.url) || []);
+      feedCacheMap.set(feedSource.url, items);
+      return items;
     } catch (error) {
-      console.error(`[${new Date().toISOString()}] Error fetching ${feedSource.name}:`, error instanceof Error ? error.message : error);
+      console.error(`Error fetching feed ${feedSource.name}:`, error);
+      // Return cached items if available to avoid empty feeds on transient errors
       return feedCacheMap.get(feedSource.url) || [];
     }
   });
@@ -361,54 +245,32 @@ let cache: {
   data: any;
   timestamp: number;
 } | null = null;
-const CACHE_DURATION = 1000 * 30; // 30 seconds throttle
+const CACHE_DURATION = 1000 * 60 * 60; // 60 minutes cache
 let isFetching = false;
 let fetchPromise: Promise<any> | null = null;
 
 // Background refresh task
-const refreshCache = async (force = false) => {
-  const now = Date.now();
-  
-  // If already fetching, return the existing promise
-  if (isFetching && fetchPromise) return fetchPromise;
-  
-  // If not forcing and cache is still fresh (within throttle window), return it
-  if (!force && cache && (now - cache.timestamp < CACHE_DURATION)) {
-    return cache.data;
+const refreshCache = async () => {
+  if (isFetching) return;
+  try {
+    isFetching = true;
+    console.log("Refreshing feed cache in background...");
+    const allItems = await fetchFeeds();
+    const responseData = {
+      title: "Aggregated GCP Feeds",
+      description: "Aggregated news and updates from Google Cloud",
+      items: allItems
+    };
+    cache = {
+      data: responseData,
+      timestamp: Date.now()
+    };
+    console.log("Feed cache refreshed successfully.");
+  } catch (error) {
+    console.error("Error in background feed refresh:", error);
+  } finally {
+    isFetching = false;
   }
-
-  isFetching = true;
-  fetchPromise = (async () => {
-    try {
-      console.log(`[${new Date().toISOString()}] Refreshing feed cache (Force: ${force})...`);
-      const allItems = await fetchFeeds();
-      
-      if (allItems.length === 0 && cache?.data) {
-        console.warn("Fetch returned 0 items, falling back to previous cache.");
-        return cache.data;
-      }
-
-      const responseData = {
-        title: "Aggregated GCP Feeds",
-        description: "Aggregated news and updates from Google Cloud",
-        items: allItems
-      };
-      cache = {
-        data: responseData,
-        timestamp: Date.now()
-      };
-      console.log(`[${new Date().toISOString()}] Feed cache refreshed with ${allItems.length} items.`);
-      return responseData;
-    } catch (error) {
-      console.error("Error in feed refresh:", error instanceof Error ? error.message : error);
-      return cache?.data || { items: [] };
-    } finally {
-      isFetching = false;
-      fetchPromise = null;
-    }
-  })();
-  
-  return fetchPromise;
 };
 
 // Initial fetch and interval
@@ -420,61 +282,45 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Hidden Stats Endpoint
-app.get("/api/health/stats", (req, res) => {
-  res.json({
-    uniqueUsers: uniqueUsers.size,
-    uniqueIPs: uniqueIPs.size,
-    totalVisits,
-    uptime: process.uptime()
-  });
-});
-
 app.get("/api/feed", async (req, res) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 0;
-    const source = req.query.source as string;
-    const force = req.query.force === 'true';
-
     // Set Cache-Control header for API response
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=600'); // Cache for 5 mins (browser), 10 mins (CDN)
 
-    let responseData;
-
-    // Always attempt to get fresh data, but respect the 30s throttle
-    responseData = await refreshCache(force);
-
-    let items = responseData.items;
-
-    // Apply source filter if specified
-    if (source) {
-      items = items.filter((item: any) => item.source === source);
+    // Return cache immediately if available and fresh
+    if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
+      return res.json(cache.data);
     }
 
-    // Apply pagination if limit is specified
-    if (limit > 0) {
-      const startIndex = (page - 1) * limit;
-      const endIndex = page * limit;
-      const total = items.length;
-      const totalPages = Math.ceil(total / limit);
-      
-      return res.json({
-        ...responseData,
-        items: items.slice(startIndex, endIndex),
-        pagination: {
-          total,
-          page,
-          limit,
-          totalPages
-        }
-      });
+    // If already fetching, wait for the existing promise
+    if (isFetching && fetchPromise) {
+      const data = await fetchPromise;
+      return res.json(data);
     }
 
-    res.json({
-      ...responseData,
-      items
-    });
+    // Otherwise trigger a new fetch
+    isFetching = true;
+    fetchPromise = (async () => {
+      try {
+        const allItems = await fetchFeeds();
+        const responseData = {
+          title: "Aggregated GCP Feeds",
+          description: "Aggregated news and updates from Google Cloud",
+          items: allItems
+        };
+        cache = {
+          data: responseData,
+          timestamp: Date.now()
+        };
+        return responseData;
+      } finally {
+        isFetching = false;
+        fetchPromise = null;
+      }
+    })();
+
+    const data = await fetchPromise;
+    res.json(data);
   } catch (error) {
     console.error("Error fetching RSS feeds:", error);
     res.status(500).json({ error: "Failed to fetch RSS feeds" });
@@ -504,27 +350,10 @@ app.post("/api/summaries", (req, res) => {
   res.json({ success: true });
 });
 
-app.get("/api/debug-enrich", async (req, res) => {
-  const items = [{
-    id: 'yt:video:wiZkPAReXmI',
-    title: 'Google Cloud Live: Hands-on AI workshop: Multimodal agents',
-    link: 'https://www.youtube.com/watch?v=wiZkPAReXmI',
-    source: 'Google Cloud YouTube',
-    videoId: 'wiZkPAReXmI'
-  }];
-  
-  const enriched = await enrichYouTubeItems(items);
-  res.json({
-    original: items,
-    enriched: enriched
-  });
-});
-
 app.get("/api/debug-key", (req, res) => {
   res.json({
     keys: Object.keys(process.env),
     GEMINI_API_KEY_LENGTH: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.length : 0,
-    hasYouTubeKey: !!process.env.YOUTUBE_API_KEY,
   });
 });
 

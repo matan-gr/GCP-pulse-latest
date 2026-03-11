@@ -9,8 +9,6 @@ import { toast } from 'sonner';
 import { marked } from 'marked';
 import { AILoading } from '../components/ui/AILoading';
 
-import { ContentSkeleton } from '../components/ContentSkeleton';
-
 interface WeeklyBriefViewProps {
   items: FeedItem[];
 }
@@ -308,17 +306,14 @@ export const WeeklyBriefView: React.FC<WeeklyBriefViewProps> = ({ items }) => {
              </button>
           </div>
         ) : loading ? (
-          <div className="p-8 md:p-12 max-w-4xl mx-auto space-y-12">
-            <div className="bg-[#f8f9fa] dark:bg-[#303134] p-12 rounded-[24px] border border-[#dadce0] dark:border-[#3c4043] shadow-inner">
-              <AILoading 
-                variant="inline" 
-                title="Generating Weekly Brief" 
-                subtitle="Analyzing the latest updates, security bulletins, and architecture changes from the last 7 days..." 
-                icon={Sparkles}
-                model="gemini-3-flash-preview"
-              />
-            </div>
-            <ContentSkeleton />
+          <div className="absolute inset-0 z-10 bg-white/90 dark:bg-[#202124]/90 backdrop-blur-sm flex items-center justify-center">
+            <AILoading 
+              variant="card" 
+              title="Generating Weekly Brief" 
+              subtitle="Analyzing the latest updates, security bulletins, and architecture changes from the last 7 days..." 
+              icon={Sparkles}
+              model="gemini-3-flash-preview"
+            />
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-full p-12 text-center">
