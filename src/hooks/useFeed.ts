@@ -24,7 +24,7 @@ export const useFeed = () => {
   return useQuery({
     queryKey: ['feed', 'all'],
     queryFn: () => fetchFeed(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
@@ -39,7 +39,7 @@ export const useInfiniteFeed = (limit = 20, source?: string) => {
       const { page, totalPages } = lastPage.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60, // 1 minute
   });
 };
 
@@ -47,7 +47,7 @@ export const useProductDeprecations = () => {
   return useQuery({
     queryKey: ['feed', 'deprecations'],
     queryFn: () => fetchFeed(1, 0, 'Release Notes'),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60, // 1 minute
     select: (data: Feed) => {
       return data.items.filter(item => {
         // We are looking for items from "Release Notes" that are about deprecations.
@@ -110,7 +110,7 @@ export const useSecurityBulletins = () => {
   return useQuery({
     queryKey: ['feed', 'security'],
     queryFn: () => fetchFeed(1, 0, 'Security Bulletins'),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60, // 1 minute
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Security Bulletins').map(item => {
         // Robust Severity Extraction
@@ -146,7 +146,7 @@ export const useArchitectureUpdates = () => {
   return useQuery({
     queryKey: ['feed', 'architecture'],
     queryFn: () => fetchFeed(1, 0, 'Architecture Center'),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60, // 1 minute
     select: (data: Feed) => {
       return data.items.filter(item => item.source === 'Architecture Center').map(item => {
         let title = item.title;

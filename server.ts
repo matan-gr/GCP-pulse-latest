@@ -10,6 +10,8 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
+import axios from 'axios';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,19 +29,14 @@ const FEEDS = [
   { url: "https://cloud.google.com/blog/rss", name: "Cloud Blog" },
   { url: "https://blog.google/products/google-cloud/rss/", name: "Product Updates" },
   { url: "https://cloud.google.com/feeds/gcp-release-notes.xml", name: "Release Notes" },
-  { url: "https://docs.cloud.google.com/feeds/google-cloud-security-bulletins.xml", name: "Security Bulletins" },
+  { url: "https://cloud.google.com/feeds/gcp-security-bulletins-feed.xml", name: "Security Bulletins" },
   { url: "https://cloud.google.com/feeds/architecture-center-release-notes.xml", name: "Architecture Center" },
   { url: "https://blog.google/technology/ai/rss/", name: "Google AI Research" },
   { url: "https://docs.cloud.google.com/feeds/gemini-enterprise-release-notes.xml", name: "Gemini Enterprise" },
-  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
+  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMJsbbGXZfJg", name: "Google Cloud YouTube" }
 ];
 
 const parser = new Parser({
-  timeout: 10000, // Increased to 10 seconds
-  headers: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Accept': 'application/rss+xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8'
-  },
   customFields: {
     item: [
       ['media:group', 'mediaGroup'],
@@ -49,6 +46,13 @@ const parser = new Parser({
     ]
   }
 });
+
+const FETCH_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+  'Accept': 'application/rss+xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache'
+};
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '10mb' })); // Increased limit for large payloads
@@ -235,8 +239,22 @@ const enrichYouTubeItems = async (items: any[]) => {
 const fetchFeeds = async () => {
   const feedPromises = FEEDS.map(async (feedSource) => {
     try {
-      const feed = await parser.parseURL(feedSource.url);
-      const items = feed.items.map(item => ({
+      console.log(`[${new Date().toISOString()}] Fetching ${feedSource.name} from ${feedSource.url}...`);
+      
+      const response = await axios.get(feedSource.url, {
+        headers: FETCH_HEADERS,
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: () => true 
+      });
+
+      if (response.status !== 200) {
+        console.error(`[${new Date().toISOString()}] HTTP ${response.status} for ${feedSource.name}`);
+        return feedCacheMap.get(feedSource.url) || [];
+      }
+
+      const feed = await parser.parseString(response.data);
+      const items = (feed.items || []).map(item => ({
         ...item,
         source: feedSource.name,
         title: cleanText(item.title),
@@ -247,11 +265,13 @@ const fetchFeeds = async () => {
       
       if (items.length > 0) {
         feedCacheMap.set(feedSource.url, items);
+        console.log(`[${new Date().toISOString()}] Successfully fetched ${items.length} items for ${feedSource.name}`);
+      } else {
+        console.warn(`[${new Date().toISOString()}] Feed ${feedSource.name} returned 0 items.`);
       }
       return items.length > 0 ? items : (feedCacheMap.get(feedSource.url) || []);
     } catch (error) {
-      console.error(`Error fetching feed ${feedSource.name}:`, error);
-      // Return cached items if available to avoid empty feeds on transient errors
+      console.error(`[${new Date().toISOString()}] Error fetching ${feedSource.name}:`, error instanceof Error ? error.message : error);
       return feedCacheMap.get(feedSource.url) || [];
     }
   });
@@ -279,19 +299,33 @@ let cache: {
   data: any;
   timestamp: number;
 } | null = null;
-const CACHE_DURATION = 1000 * 60 * 60; // 60 minutes cache
+const CACHE_DURATION = 1000 * 30; // 30 seconds throttle
 let isFetching = false;
 let fetchPromise: Promise<any> | null = null;
 
 // Background refresh task
-const refreshCache = async () => {
-  if (isFetching) return fetchPromise;
+const refreshCache = async (force = false) => {
+  const now = Date.now();
   
+  // If already fetching, return the existing promise
+  if (isFetching && fetchPromise) return fetchPromise;
+  
+  // If not forcing and cache is still fresh (within throttle window), return it
+  if (!force && cache && (now - cache.timestamp < CACHE_DURATION)) {
+    return cache.data;
+  }
+
   isFetching = true;
   fetchPromise = (async () => {
     try {
-      console.log("Refreshing feed cache...");
+      console.log(`[${new Date().toISOString()}] Refreshing feed cache (Force: ${force})...`);
       const allItems = await fetchFeeds();
+      
+      if (allItems.length === 0 && cache?.data) {
+        console.warn("Fetch returned 0 items, falling back to previous cache.");
+        return cache.data;
+      }
+
       const responseData = {
         title: "Aggregated GCP Feeds",
         description: "Aggregated news and updates from Google Cloud",
@@ -301,10 +335,10 @@ const refreshCache = async () => {
         data: responseData,
         timestamp: Date.now()
       };
-      console.log(`Feed cache refreshed successfully with ${allItems.length} items.`);
+      console.log(`[${new Date().toISOString()}] Feed cache refreshed with ${allItems.length} items.`);
       return responseData;
     } catch (error) {
-      console.error("Error in feed refresh:", error);
+      console.error("Error in feed refresh:", error instanceof Error ? error.message : error);
       return cache?.data || { items: [] };
     } finally {
       isFetching = false;
@@ -339,19 +373,15 @@ app.get("/api/feed", async (req, res) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 0;
     const source = req.query.source as string;
+    const force = req.query.force === 'true';
 
     // Set Cache-Control header for API response
-    res.set('Cache-Control', 'public, max-age=300, s-maxage=600'); // Cache for 5 mins (browser), 10 mins (CDN)
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 
     let responseData;
 
-    // Return cache immediately if available and fresh
-    if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
-      responseData = cache.data;
-    } else {
-      // Trigger or wait for refresh
-      responseData = await refreshCache();
-    }
+    // Always attempt to get fresh data, but respect the 30s throttle
+    responseData = await refreshCache(force);
 
     let items = responseData.items;
 
