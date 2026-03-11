@@ -26,7 +26,7 @@ app.set('trust proxy', 1);
 // REMOVED: AI endpoints have been moved to the frontend to comply with security guidelines.
 
 const FEEDS = [
-  { url: "https://cloud.google.com/blog/rss", name: "Cloud Blog" },
+  { url: "https://cloudblog.withgoogle.com/rss/", name: "Cloud Blog" },
   { url: "https://blog.google/products/google-cloud/rss/", name: "Product Updates" },
   { url: "https://cloud.google.com/feeds/gcp-release-notes.xml", name: "Release Notes" },
   { url: "https://cloud.google.com/feeds/gcp-security-bulletins-feed.xml", name: "Security Bulletins" },
@@ -106,6 +106,17 @@ const cleanText = (text: string | undefined) => {
     .replace(/&nbsp;/g, " ") // Replace &nbsp;
     .replace(/\s+/g, " ") // Normalize whitespace
     .trim();
+};
+
+// Helper to sanitize XML before parsing
+const sanitizeXml = (xml: string) => {
+  if (!xml) return "";
+  // 1. Remove invalid XML characters
+  const sanitized = xml.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g, "");
+  
+  // 2. Replace stray ampersands that are not part of an entity
+  // This regex matches '&' that is NOT followed by (a-z or # and then digits) and then ';'
+  return sanitized.replace(/&(?!(?:[a-zA-Z]+|#[0-9]+|#x[0-9a-fA-F]+);)/g, '&amp;');
 };
 
 // Helper to format ISO 8601 duration
@@ -241,19 +252,25 @@ const fetchFeeds = async () => {
     try {
       console.log(`[${new Date().toISOString()}] Fetching ${feedSource.name} from ${feedSource.url}...`);
       
-      const response = await axios.get(feedSource.url, {
-        headers: FETCH_HEADERS,
-        timeout: 20000,
-        maxRedirects: 5,
-        validateStatus: () => true 
-      });
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 30000); // 30s timeout
 
-      if (response.status !== 200) {
+      const response = await fetch(feedSource.url, {
+        headers: FETCH_HEADERS,
+        signal: abortController.signal,
+        redirect: 'follow'
+      });
+      
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
         console.error(`[${new Date().toISOString()}] HTTP ${response.status} for ${feedSource.name}`);
         return feedCacheMap.get(feedSource.url) || [];
       }
 
-      const feed = await parser.parseString(response.data);
+      const rawData = await response.text();
+      const sanitizedData = sanitizeXml(rawData);
+      const feed = await parser.parseString(sanitizedData);
       const items = (feed.items || []).map(item => ({
         ...item,
         source: feedSource.name,
