@@ -54,9 +54,13 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   // Keyboard shortcut to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        inputRef.current?.focus();
+        // Only focus if the input is visible (handles duplicated responsive components)
+        if (inputRef.current && inputRef.current.offsetParent !== null) {
+          inputRef.current.focus();
+          inputRef.current.select();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);

@@ -328,8 +328,14 @@ function AppContent() {
 
       if (e.key === '/') {
         e.preventDefault();
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) searchInput.focus();
+        const searchInputs = document.querySelectorAll('#search-input');
+        for (const input of searchInputs) {
+          if ((input as HTMLElement).offsetParent !== null) {
+            (input as HTMLInputElement).focus();
+            (input as HTMLInputElement).select();
+            break;
+          }
+        }
       }
       
       // Tab switching with Cmd/Ctrl + Number

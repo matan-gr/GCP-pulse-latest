@@ -29,11 +29,11 @@ const FEEDS = [
   { url: "https://cloudblog.withgoogle.com/rss/", name: "Cloud Blog" },
   { url: "https://blog.google/products/google-cloud/rss/", name: "Product Updates" },
   { url: "https://cloud.google.com/feeds/gcp-release-notes.xml", name: "Release Notes" },
-  { url: "https://cloud.google.com/feeds/gcp-security-bulletins-feed.xml", name: "Security Bulletins" },
+  { url: "https://cloud.google.com/feeds/google-cloud-security-bulletins.xml", name: "Security Bulletins" },
   { url: "https://cloud.google.com/feeds/architecture-center-release-notes.xml", name: "Architecture Center" },
   { url: "https://blog.google/technology/ai/rss/", name: "Google AI Research" },
   { url: "https://docs.cloud.google.com/feeds/gemini-enterprise-release-notes.xml", name: "Gemini Enterprise" },
-  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMJsbbGXZfJg", name: "Google Cloud YouTube" }
+  { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCJS9pqu9BzkAMNTmzNMNhvg", name: "Google Cloud YouTube" }
 ];
 
 const parser = new Parser({
@@ -217,6 +217,7 @@ const enrichYouTubeItems = async (items: any[]) => {
     const enrichedItems = await Promise.all(items.map(async (item) => {
       const videoId = videoIds.find(id => item.link?.includes(id) || item.id?.includes(id));
       const details = allDetails.find(d => d.id === videoId);
+      console.log(`Enriching item ${item.id}, videoId: ${videoId}, found details: ${!!details}`);
       if (details) {
         // Use existing tags from YouTube
         const labels = details.snippet.tags || [];
@@ -225,12 +226,14 @@ const enrichYouTubeItems = async (items: any[]) => {
           ...item,
           duration: formatDuration(details.contentDetails.duration),
           viewCount: parseInt(details.statistics.viewCount, 10),
-          likeCount: parseInt(details.statistics.likeCount, 10),
+          likeCount: parseInt(details.statistics.likeCount || '0', 10),
           channelTitle: details.snippet.channelTitle,
           categories: labels,
           videoId: details.id,
           thumbnailUrl: details.snippet.thumbnails?.maxres?.url || details.snippet.thumbnails?.high?.url || details.snippet.thumbnails?.medium?.url || details.snippet.thumbnails?.default?.url
         };
+      } else if (item.source === "Google Cloud YouTube") {
+        console.warn(`No details found for video ID: ${videoId}, allDetails length: ${allDetails.length}`);
       }
       return item;
     }));
@@ -250,6 +253,48 @@ const enrichYouTubeItems = async (items: any[]) => {
 const fetchFeeds = async () => {
   const feedPromises = FEEDS.map(async (feedSource) => {
     try {
+      if (feedSource.name === "Google Cloud YouTube") {
+        const apiKey = (process.env.YOUTUBE_API_KEY || '').trim().replace(/^["']|["']$/g, '');
+        if (!apiKey) {
+          console.warn(`[${new Date().toISOString()}] YOUTUBE_API_KEY is missing. Skipping YouTube feed.`);
+          return feedCacheMap.get(feedSource.url) || [];
+        }
+
+        console.log(`[${new Date().toISOString()}] Fetching YouTube videos via Data API...`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=UUJS9pqu9BzkAMNTmzNMNhvg&maxResults=20&key=${apiKey}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          console.error(`[${new Date().toISOString()}] YouTube API error: ${response.statusText}`);
+          return feedCacheMap.get(feedSource.url) || [];
+        }
+
+        const data = await response.json();
+        const items = (data.items || []).map((item: any) => ({
+          id: `yt:video:${item.snippet.resourceId.videoId}`,
+          title: cleanText(item.snippet.title),
+          link: `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`,
+          isoDate: new Date(item.snippet.publishedAt).toISOString(),
+          contentSnippet: cleanText(item.snippet.description),
+          content: cleanText(item.snippet.description),
+          source: feedSource.name,
+          videoId: item.snippet.resourceId.videoId,
+          channelId: item.snippet.channelId,
+          author: item.snippet.channelTitle
+        }));
+
+        if (items.length > 0) {
+          feedCacheMap.set(feedSource.url, items);
+          console.log(`[${new Date().toISOString()}] Successfully fetched ${items.length} items for ${feedSource.name}`);
+        }
+        return items.length > 0 ? items : (feedCacheMap.get(feedSource.url) || []);
+      }
+
       console.log(`[${new Date().toISOString()}] Fetching ${feedSource.name} from ${feedSource.url}...`);
       
       const abortController = new AbortController();
@@ -459,10 +504,27 @@ app.post("/api/summaries", (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/api/debug-enrich", async (req, res) => {
+  const items = [{
+    id: 'yt:video:wiZkPAReXmI',
+    title: 'Google Cloud Live: Hands-on AI workshop: Multimodal agents',
+    link: 'https://www.youtube.com/watch?v=wiZkPAReXmI',
+    source: 'Google Cloud YouTube',
+    videoId: 'wiZkPAReXmI'
+  }];
+  
+  const enriched = await enrichYouTubeItems(items);
+  res.json({
+    original: items,
+    enriched: enriched
+  });
+});
+
 app.get("/api/debug-key", (req, res) => {
   res.json({
     keys: Object.keys(process.env),
     GEMINI_API_KEY_LENGTH: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.length : 0,
+    hasYouTubeKey: !!process.env.YOUTUBE_API_KEY,
   });
 });
 
